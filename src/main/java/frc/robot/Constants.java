@@ -35,5 +35,11 @@ public final class Constants {
         public static final double GEAR_RATIO = 364d / 36d;
     
         public static final double WHEEL_CIRCUMFRENCE = 0.489;
+
+        public static final int FRONT_RIGHT_MOTOR = 11;
+        public static final int BACK_RIGHT_MOTOR = 10;
+
+        public static final int FRONT_LEFT_MOTOR = 13;
+        public static final int BACK_LEFT_MOTOR = 12;
       }
 }

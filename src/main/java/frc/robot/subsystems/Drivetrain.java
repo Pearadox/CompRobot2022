@@ -3,6 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
@@ -18,15 +20,17 @@ import static frc.robot.Constants.DrivetrainConstants.*;
 
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.Constants.DrivetrainConstants;
 
 public class Drivetrain extends SubsystemBase {
   /** Creates a new Drivetrain. */
   private static Drivetrain INSTANCE;
 
-  private final CANSparkMax leftMotor1 = new CANSparkMax(11, MotorType.kBrushless);
-  private final CANSparkMax leftMotor2 = new CANSparkMax(10, MotorType.kBrushless);
-  private final CANSparkMax rightMotor1 = new CANSparkMax(13, MotorType.kBrushless);
-  private final CANSparkMax rightMotor2 = new CANSparkMax(12, MotorType.kBrushless);
+  private final CANSparkMax leftMotor1 = new CANSparkMax(DrivetrainConstants.FRONT_LEFT_MOTOR, MotorType.kBrushless);
+  private final CANSparkMax leftMotor2 = new CANSparkMax(DrivetrainConstants.BACK_LEFT_MOTOR, MotorType.kBrushless);
+  private final CANSparkMax rightMotor1 = new CANSparkMax(DrivetrainConstants.FRONT_RIGHT_MOTOR, MotorType.kBrushless);
+  private final CANSparkMax rightMotor2 = new CANSparkMax(DrivetrainConstants.BACK_RIGHT_MOTOR, MotorType.kBrushless);
 
   private final RelativeEncoder leftEncoder1 = leftMotor1.getEncoder();
   private final RelativeEncoder leftEncoder2 = leftMotor2.getEncoder();
@@ -42,6 +46,9 @@ public class Drivetrain extends SubsystemBase {
 
     leftMotor2.follow(leftMotor1);
     rightMotor2.follow(rightMotor1);
+
+    if(!SmartDashboard.containsKey("LeftMotor")) SmartDashboard.putNumber("LeftMotor", 0);
+    if(!SmartDashboard.containsKey("RightMotor")) SmartDashboard.putNumber("RightMotor", 0);
   }
 
   public void setVoltages(double left, double right) {
@@ -51,9 +58,7 @@ public class Drivetrain extends SubsystemBase {
 
   public void setSpeed(double left, double right) {
     leftMotor1.set(left);
-    // leftMotor2.set(left);
     rightMotor1.set(right);
-    // rightMotor2.set(right);
   }
 
   public double getLeftEncoderRevs() {
@@ -84,25 +89,46 @@ public class Drivetrain extends SubsystemBase {
     if(throttle < 0.1 && throttle > -0.1) {
       throttle = 0;
     } 
-    if (twist < 0.1 && twist > -0.1) {
+    if (twist < 0.15 && twist > -0.15) {
       twist = 0;
     }
 
+      double leftOutput = Math.sin(throttle + twist) * Math.pow(throttle + twist, 2);
+      double rightOutput = Math.sin(throttle - twist) * Math.pow(throttle - twist,2);
+      
+      setSpeed(-leftOutput * 0.75, rightOutput * 0.75);
+  }
+  
+  private final DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()));
 
-      double leftOutput = throttle - twist;
-      double rightOutput = throttle + twist;
-      SmartDashboard.putNumber("LeftMotor", leftOutput);
-      SmartDashboard.putNumber("RightMotor", rightOutput);
-      setSpeed(leftOutput * 0.25, rightOutput * 0.25);
+  public void zeroHeading() {
+    m_gyro.reset();   
   }
 
-  // private final DifferentialDriveOdometry m_odometry;
+  public void resetOdometry(Pose2d pose) {
+    encoderReset();
+    zeroHeading();
+    m_odometry.resetPosition(pose, Rotation2d.fromDegrees(-getHeading()));
+  }
+
+  public void encoderReset() {
+    leftEncoder1.setPosition(0);
+    leftEncoder2.setPosition(0);
+    rightEncoder1.setPosition(0);
+    rightEncoder2.setPosition(0);
+  }
+
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    // m_odometry.update(
-    //   m_gyro.getRotation2d(), getLeftEncoderDistance(), getRightEncoderDistance());
+    m_odometry.update(
+      m_gyro.getRotation2d(), getLeftEncoderDistance(), getRightEncoderDistance());
+  }
+
+  public void dashboard() {
+    SmartDashboard.putNumber("LeftMotorVoltage", leftMotor1.getBusVoltage());
+    SmartDashboard.putNumber("RightMotorVoltage", rightMotor1.getBusVoltage());
   }
 
   public static Drivetrain getInstance() {

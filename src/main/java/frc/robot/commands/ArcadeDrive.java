@@ -20,7 +20,7 @@ public class ArcadeDrive extends CommandBase {
    */
   public ArcadeDrive() {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(RobotContainer.drivetrain, RobotContainer.intake);
+    addRequirements(RobotContainer.drivetrain);
   }
 
   // Called when the command is initially scheduled.
@@ -30,8 +30,7 @@ public class ArcadeDrive extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    RobotContainer.intake.setSpeed(0.25);
-    RobotContainer.drivetrain.arcadeDrive(RobotContainer.driverJoystick.getY(), RobotContainer.driverJoystick.getZ());
+    RobotContainer.drivetrain.arcadeDrive(-RobotContainer.driverJoystick.getY(), RobotContainer.driverJoystick.getZ());
   }
 
   // Called once the command ends or is interrupted.

@@ -17,7 +17,7 @@ public class intakeOut extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    RobotContainer.intake.setSpeed(-0.1);
+    RobotContainer.intake.setIntakeOut();
   }
 
   // Called every time the scheduler runs while the command is scheduled.

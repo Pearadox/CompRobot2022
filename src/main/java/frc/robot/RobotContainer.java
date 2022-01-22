@@ -7,12 +7,13 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import frc.robot.commands.ArcadeDrive;
 import frc.robot.commands.intakeIn;
+import frc.robot.commands.intakeOut;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -42,11 +43,13 @@ public class RobotContainer {
    */
 
   public final static Joystick driverJoystick = new Joystick(0);
+  
   JoystickButton btn1 = new JoystickButton(driverJoystick, 7);
   JoystickButton btn2 = new JoystickButton(driverJoystick, 8);
 
   private void configureButtonBindings() {
-    // btn1.whenPressed(new intakeIn());
+    btn1.whileHeld(new intakeIn());
+    btn2.whileHeld(new intakeOut());
   }
 
   /**

@@ -24,12 +24,23 @@ public class Intake extends SubsystemBase {
     intakeMotor.set(speed);
   }
 
+  public void setIntakeIn() {
+    setSpeed(-0.5);
+  }
+
+  public void setIntakeOut() {
+    setSpeed(0.5);
+  }
   public void zero() {
     setSpeed(0);
   }
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  }
+
+  public void dashboard() {
+    
   }
 
   public static Intake getInstance() {

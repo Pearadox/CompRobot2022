@@ -19,6 +19,31 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
+  public static int brownOutCtn = 0;
+
+  // Add Debug flags
+  // You can have a flag for each subsystem, etc
+  public static final String _controls = "CONTROL";
+  public static final String _general = "GENERAL";
+  public static final String _auton = "AUTON";
+  public static final String _drive = "DRIVE";
+  public static final String drivetrain = "DRIVETRAIN";
+  public static final String intake = "INTAKE";
+  
+  public enum RobotState {
+    DISABLED, AUTONOMOUS, TELEOP, TEST
+  }
+
+  public static RobotState s_robot_state = RobotState.DISABLED;
+
+  public static RobotState getState() {
+    return s_robot_state;
+  }
+
+  public static void setState(final RobotState state) {
+    s_robot_state = state;
+  }
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -48,7 +73,9 @@ public class Robot extends TimedRobot {
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    setState(RobotState.DISABLED);
+  }
 
   @Override
   public void disabledPeriodic() {}
