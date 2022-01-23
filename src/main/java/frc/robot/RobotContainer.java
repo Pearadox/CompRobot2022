@@ -7,13 +7,13 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.ArcadeDrive;
 import frc.robot.commands.intakeIn;
 import frc.robot.commands.intakeOut;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -23,8 +23,8 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  public final static Drivetrain drivetrain = Drivetrain.getInstance();
-  public final static Intake intake = Intake.getInstance();
+  public static final Drivetrain drivetrain = Drivetrain.getInstance();
+  public static final Intake intake = Intake.getInstance();
 
   // private final ExampleCommand m_autoCommand = new ExampleCommand(m_Drivetrain);
 
@@ -41,9 +41,8 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
+  public static final Joystick driverJoystick = new Joystick(0);
 
-  public final static Joystick driverJoystick = new Joystick(0);
-  
   JoystickButton btn1 = new JoystickButton(driverJoystick, 7);
   JoystickButton btn2 = new JoystickButton(driverJoystick, 8);
 

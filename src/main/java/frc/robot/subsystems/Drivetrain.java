@@ -3,52 +3,49 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
+
+import static frc.robot.Constants.DrivetrainConstants.*;
+
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
-import com.kauailabs.navx.frc.AHRS;
-import static frc.robot.Constants.DrivetrainConstants.*;
-
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.DrivetrainConstants;
 
 public class Drivetrain extends SubsystemBase {
   /** Creates a new Drivetrain. */
   private static Drivetrain INSTANCE;
 
-  private final CANSparkMax leftMotor1 = new CANSparkMax(DrivetrainConstants.FRONT_LEFT_MOTOR, MotorType.kBrushless);
-  private final CANSparkMax leftMotor2 = new CANSparkMax(DrivetrainConstants.BACK_LEFT_MOTOR, MotorType.kBrushless);
-  private final CANSparkMax rightMotor1 = new CANSparkMax(DrivetrainConstants.FRONT_RIGHT_MOTOR, MotorType.kBrushless);
-  private final CANSparkMax rightMotor2 = new CANSparkMax(DrivetrainConstants.BACK_RIGHT_MOTOR, MotorType.kBrushless);
+  private final CANSparkMax leftMotor1 =
+      new CANSparkMax(DrivetrainConstants.FRONT_LEFT_MOTOR, MotorType.kBrushless);
+  private final CANSparkMax leftMotor2 =
+      new CANSparkMax(DrivetrainConstants.BACK_LEFT_MOTOR, MotorType.kBrushless);
+  private final CANSparkMax rightMotor1 =
+      new CANSparkMax(DrivetrainConstants.FRONT_RIGHT_MOTOR, MotorType.kBrushless);
+  private final CANSparkMax rightMotor2 =
+      new CANSparkMax(DrivetrainConstants.BACK_RIGHT_MOTOR, MotorType.kBrushless);
 
   private final RelativeEncoder leftEncoder1 = leftMotor1.getEncoder();
   private final RelativeEncoder leftEncoder2 = leftMotor2.getEncoder();
   private final RelativeEncoder rightEncoder1 = rightMotor1.getEncoder();
   private final RelativeEncoder rightEncoder2 = rightMotor2.getEncoder();
 
-  
-
   private Drivetrain() {
-    
+
     // rightMotor2.setInverted(true);
     // leftMotor2.setInverted(true);
 
     leftMotor2.follow(leftMotor1);
     rightMotor2.follow(rightMotor1);
 
-    if(!SmartDashboard.containsKey("LeftMotor")) SmartDashboard.putNumber("LeftMotor", 0);
-    if(!SmartDashboard.containsKey("RightMotor")) SmartDashboard.putNumber("RightMotor", 0);
+    if (!SmartDashboard.containsKey("LeftMotor")) SmartDashboard.putNumber("LeftMotor", 0);
+    if (!SmartDashboard.containsKey("RightMotor")) SmartDashboard.putNumber("RightMotor", 0);
   }
 
   public void setVoltages(double left, double right) {
@@ -76,33 +73,36 @@ public class Drivetrain extends SubsystemBase {
   public double getRightEncoderDistance() {
     return getRightEncoderRevs() * WHEEL_CIRCUMFRENCE / GEAR_RATIO;
   }
-  
-  public DifferentialDriveWheelSpeeds getWheelSpeeds(){
+
+  public DifferentialDriveWheelSpeeds getWheelSpeeds() {
     return new DifferentialDriveWheelSpeeds();
   }
+
   private final ADXRS450_Gyro m_gyro = new ADXRS450_Gyro();
+
   public double getHeading() {
     return m_gyro.getRotation2d().getDegrees();
   }
 
   public void arcadeDrive(double throttle, double twist) {
-    if(throttle < 0.1 && throttle > -0.1) {
+    if (throttle < 0.1 && throttle > -0.1) {
       throttle = 0;
-    } 
+    }
     if (twist < 0.15 && twist > -0.15) {
       twist = 0;
     }
 
-      double leftOutput = Math.sin(throttle + twist) * Math.pow(throttle + twist, 2);
-      double rightOutput = Math.sin(throttle - twist) * Math.pow(throttle - twist,2);
-      
-      setSpeed(-leftOutput * 0.75, rightOutput * 0.75);
+    double leftOutput = Math.sin(throttle + twist) * Math.pow(throttle + twist, 2);
+    double rightOutput = Math.sin(throttle - twist) * Math.pow(throttle - twist, 2);
+
+    setSpeed(-leftOutput * 0.75, rightOutput * 0.75);
   }
-  
-  private final DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()));
+
+  private final DifferentialDriveOdometry m_odometry =
+      new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()));
 
   public void zeroHeading() {
-    m_gyro.reset();   
+    m_gyro.reset();
   }
 
   public void resetOdometry(Pose2d pose) {
@@ -118,12 +118,10 @@ public class Drivetrain extends SubsystemBase {
     rightEncoder2.setPosition(0);
   }
 
-
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    m_odometry.update(
-      m_gyro.getRotation2d(), getLeftEncoderDistance(), getRightEncoderDistance());
+    m_odometry.update(m_gyro.getRotation2d(), getLeftEncoderDistance(), getRightEncoderDistance());
   }
 
   public void dashboard() {

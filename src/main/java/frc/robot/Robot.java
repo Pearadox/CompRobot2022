@@ -29,9 +29,12 @@ public class Robot extends TimedRobot {
   public static final String _drive = "DRIVE";
   public static final String drivetrain = "DRIVETRAIN";
   public static final String intake = "INTAKE";
-  
+
   public enum RobotState {
-    DISABLED, AUTONOMOUS, TELEOP, TEST
+    DISABLED,
+    AUTONOMOUS,
+    TELEOP,
+    TEST
   }
 
   public static RobotState s_robot_state = RobotState.DISABLED;

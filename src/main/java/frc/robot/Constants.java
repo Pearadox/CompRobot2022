@@ -15,31 +15,31 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-    public static final class DrivetrainConstants {
-        public static final double kS = 0.16734; // Volts
-        public static final double kV = 2.6713;  // Volt Seconds per Meter
-        public static final double kA = 0.27882; // Volt Seconds Squared per Meter
-        
-        public static final double kPVel = 6.9201; // Volt Seconds per Meter
-        
-        public static final double TRACK_WIDTH = 0.5461; // Meters
-        public static final DifferentialDriveKinematics KINEMATICS = 
-            new DifferentialDriveKinematics(TRACK_WIDTH);
-        
-        public static final double MAX_VELOCITY = 3.6;
-        public static final double MAX_ACCEL = 3;
-        
-        public static final double kRamseteB = 2;
-        public static final double kRamseteZeta = 0.7;
-    
-        public static final double GEAR_RATIO = 364d / 36d;
-    
-        public static final double WHEEL_CIRCUMFRENCE = 0.489;
+  public static final class DrivetrainConstants {
+    public static final double kS = 0.16734; // Volts
+    public static final double kV = 2.6713; // Volt Seconds per Meter
+    public static final double kA = 0.27882; // Volt Seconds Squared per Meter
 
-        public static final int FRONT_RIGHT_MOTOR = 11;
-        public static final int BACK_RIGHT_MOTOR = 10;
+    public static final double kPVel = 6.9201; // Volt Seconds per Meter
 
-        public static final int FRONT_LEFT_MOTOR = 13;
-        public static final int BACK_LEFT_MOTOR = 12;
-      }
+    public static final double TRACK_WIDTH = 0.5461; // Meters
+    public static final DifferentialDriveKinematics KINEMATICS =
+        new DifferentialDriveKinematics(TRACK_WIDTH);
+
+    public static final double MAX_VELOCITY = 3.6;
+    public static final double MAX_ACCEL = 3;
+
+    public static final double kRamseteB = 2;
+    public static final double kRamseteZeta = 0.7;
+
+    public static final double GEAR_RATIO = 364d / 36d;
+
+    public static final double WHEEL_CIRCUMFRENCE = 0.489;
+
+    public static final int FRONT_RIGHT_MOTOR = 11;
+    public static final int BACK_RIGHT_MOTOR = 10;
+
+    public static final int FRONT_LEFT_MOTOR = 13;
+    public static final int BACK_LEFT_MOTOR = 12;
+  }
 }
