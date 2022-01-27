@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.math.util.Units;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -26,6 +27,14 @@ public final class Constants {
     public static final DifferentialDriveKinematics KINEMATICS =
         new DifferentialDriveKinematics(TRACK_WIDTH);
 
+    public static final double WHEEL_DIAMETER = Units.inchesToMeters(6.0); //Meters
+
+    public static final double DISTANCE_PER_REVOLUTION = WHEEL_DIAMETER * Math.PI;
+    public static final double PULSES_PER_REVOLUTION = 42 * 5.6;
+    public static final double DISTANCE_PER_PULSE = DISTANCE_PER_REVOLUTION / PULSES_PER_REVOLUTION;
+    public static final double SECONDS_PER_MINUTE = 60.0d;
+    public static final double GEAR_REDUCTION = 13.8;
+
     public static final double MAX_VELOCITY = 3.6;
     public static final double MAX_ACCEL = 3;
 
@@ -34,7 +43,7 @@ public final class Constants {
 
     public static final double GEAR_RATIO = 364d / 36d;
 
-    public static final double WHEEL_CIRCUMFRENCE = 0.489;
+    public static final double WHEEL_CIRCUMFRENCE = 2 * Math.PI * (WHEEL_DIAMETER/2);
 
     public static final int FRONT_RIGHT_MOTOR = 11;
     public static final int BACK_RIGHT_MOTOR = 10;
