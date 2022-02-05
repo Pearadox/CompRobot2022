@@ -12,8 +12,11 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.ArcadeDrive;
 import frc.robot.commands.intakeIn;
 import frc.robot.commands.intakeOut;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Transport;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -25,6 +28,9 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   public static final Drivetrain drivetrain = Drivetrain.getInstance();
   public static final Intake intake = Intake.getInstance();
+  public static final Transport transport = Transport.getInstance();
+  public static final Shooter shooter = Shooter.getInstance();
+  public static final Climber climber = Climber.getInstance();
 
   // private final ExampleCommand m_autoCommand = new ExampleCommand(m_Drivetrain);
 

@@ -4,13 +4,36 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.TransportConstants;
 
 public class Transport extends SubsystemBase {
   private static Transport INSTANCE;
 
+  private final CANSparkMax topTransportMotor;
+  private final CANSparkMax botTransportMotor;
+
   /** Creates a new Transport. */
-  public Transport() {}
+  public Transport() {
+    topTransportMotor = new CANSparkMax(TransportConstants.TOP_TRANSPORT_MOTOR, MotorType.kBrushless);
+    botTransportMotor = new CANSparkMax(TransportConstants.BOT_TRANSPORT_MOTOR, MotorType.kBrushless);
+  }
+
+  public void setSpeed(double speed) {
+    topTransportMotor.set(speed);
+    botTransportMotor.set(speed);
+  }
+
+  public void transportIn() {
+    setSpeed(0.5);
+  }
+
+  public void transportOut() {
+    setSpeed(-0.5);
+  }
 
   public void dashboard() {
   }

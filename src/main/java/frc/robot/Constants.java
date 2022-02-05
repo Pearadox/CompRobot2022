@@ -51,4 +51,13 @@ public final class Constants {
     public static final int FRONT_LEFT_MOTOR = 13;
     public static final int BACK_LEFT_MOTOR = 12;
   }
+
+  public static final class TransportConstants {
+    public static final int TOP_TRANSPORT_MOTOR = 14;
+    public static final int BOT_TRANSPORT_MOTOR = 15;
+  }
+
+  public static final class IntakeConstants {
+    public static final int INTAKE_MOTOR = 16;
+  }
 }
