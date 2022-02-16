@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -14,17 +16,17 @@ public class Transport extends SubsystemBase {
   private static Transport INSTANCE;
 
   private final CANSparkMax topTransportMotor;
-  private final CANSparkMax botTransportMotor;
+  private final TalonSRX botTransportMotor;
 
   /** Creates a new Transport. */
   public Transport() {
     topTransportMotor = new CANSparkMax(TransportConstants.TOP_TRANSPORT_MOTOR, MotorType.kBrushless);
-    botTransportMotor = new CANSparkMax(TransportConstants.BOT_TRANSPORT_MOTOR, MotorType.kBrushless);
+    botTransportMotor = new TalonSRX(15);
   }
 
   public void setSpeed(double speed) {
     topTransportMotor.set(speed);
-    botTransportMotor.set(speed);
+    botTransportMotor.set(ControlMode.PercentOutput, speed);
   }
 
   public void transportIn() {
@@ -33,6 +35,10 @@ public class Transport extends SubsystemBase {
 
   public void transportOut() {
     setSpeed(-0.5);
+  }
+
+  public void transportStop() {
+    setSpeed(0);
   }
 
   public void dashboard() {

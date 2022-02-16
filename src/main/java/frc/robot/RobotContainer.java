@@ -8,10 +8,9 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.ArcadeDrive;
-import frc.robot.commands.intakeIn;
-import frc.robot.commands.intakeOut;
+import frc.robot.commands.*;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
@@ -49,12 +48,21 @@ public class RobotContainer {
    */
   public static final Joystick driverJoystick = new Joystick(0);
 
-  JoystickButton btn1 = new JoystickButton(driverJoystick, 7);
-  JoystickButton btn2 = new JoystickButton(driverJoystick, 8);
+  JoystickButton btn7 = new JoystickButton(driverJoystick, 7);
+  JoystickButton btn8 = new JoystickButton(driverJoystick, 8);
+  JoystickButton btn9 = new JoystickButton(driverJoystick, 9);
+  JoystickButton btn10 = new JoystickButton(driverJoystick, 10);
+  JoystickButton btn11 = new JoystickButton(driverJoystick, 11);
+  JoystickButton btn12 = new JoystickButton(driverJoystick, 12);
 
   private void configureButtonBindings() {
-    btn1.whileHeld(new intakeIn());
-    btn2.whileHeld(new intakeOut());
+    btn7.whileHeld(new intakeIn());
+    btn8.whileHeld(new intakeOut());
+    btn9.whileHeld(new transportIn());
+    btn10.whileHeld(new transportOut());
+    btn11.whileHeld(
+      new RunCommand(() -> shooter.setSpeed(0.475), shooter)
+    ).whenReleased(() -> shooter.setSpeed(0));
   }
 
   /**

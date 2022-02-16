@@ -22,11 +22,11 @@ public class Intake extends SubsystemBase {
   }
 
   public void setIntakeIn() {
-    setSpeed(-0.5);
+    setSpeed(0.3);
   }
 
   public void setIntakeOut() {
-    setSpeed(0.5);
+    setSpeed(-0.5);
   }
 
   public void zero() {
