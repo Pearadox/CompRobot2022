@@ -9,6 +9,8 @@ import static frc.robot.Constants.DrivetrainConstants.*;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkMax.IdleMode;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
@@ -16,6 +18,8 @@ import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.drivers.PearadoxSparkMax;
+import frc.lib.drivers.PearadoxSparkMax.PearadoxNeo;
 import frc.robot.Constants.DrivetrainConstants;
 
 public class Drivetrain extends SubsystemBase {
@@ -23,14 +27,14 @@ public class Drivetrain extends SubsystemBase {
   private static Drivetrain INSTANCE;
 
   private final CANSparkMax leftMotor1 =
-      new CANSparkMax(DrivetrainConstants.FRONT_LEFT_MOTOR, MotorType.kBrushless);
+      new PearadoxNeo(DrivetrainConstants.FRONT_LEFT_MOTOR, IdleMode.kBrake);
   private final CANSparkMax leftMotor2 =
-      new CANSparkMax(DrivetrainConstants.BACK_LEFT_MOTOR, MotorType.kBrushless);
+      new PearadoxNeo(DrivetrainConstants.BACK_LEFT_MOTOR, IdleMode.kBrake);
   private final CANSparkMax rightMotor1 =
-      new CANSparkMax(DrivetrainConstants.FRONT_RIGHT_MOTOR, MotorType.kBrushless);
+      new PearadoxNeo(DrivetrainConstants.FRONT_RIGHT_MOTOR, IdleMode.kCoast);
   private final CANSparkMax rightMotor2 =
-      new CANSparkMax(DrivetrainConstants.BACK_RIGHT_MOTOR, MotorType.kBrushless);
-
+      new PearadoxNeo(DrivetrainConstants.BACK_RIGHT_MOTOR, IdleMode.kCoast);
+  
   private final RelativeEncoder leftEncoder1 = leftMotor1.getEncoder();
   private final RelativeEncoder leftEncoder2 = leftMotor2.getEncoder();
   private final RelativeEncoder rightEncoder1 = rightMotor1.getEncoder();
