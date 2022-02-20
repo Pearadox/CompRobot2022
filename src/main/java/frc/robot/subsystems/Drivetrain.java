@@ -26,7 +26,7 @@ public class Drivetrain extends SubsystemBase {
   /** Creates a new Drivetrain. */
   private static Drivetrain INSTANCE;
 
-  private final CANSparkMax leftMotor1 =
+  public final CANSparkMax leftMotor1 =
       new PearadoxNeo(DrivetrainConstants.FRONT_LEFT_MOTOR, IdleMode.kBrake);
   private final CANSparkMax leftMotor2 =
       new PearadoxNeo(DrivetrainConstants.BACK_LEFT_MOTOR, IdleMode.kBrake);

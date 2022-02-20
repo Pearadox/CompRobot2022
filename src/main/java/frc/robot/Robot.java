@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import com.revrobotics.REVPhysicsSim;
+
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -122,4 +125,14 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {}
+
+  @Override
+  public void simulationInit() {
+    REVPhysicsSim.getInstance().addSparkMax(m_robotContainer.drivetrain.leftMotor1, DCMotor.getNEO(1));
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    REVPhysicsSim.getInstance().run();
+  }
 }

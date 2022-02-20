@@ -4,18 +4,16 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.*;
-import frc.robot.subsystems.Climber;
-import frc.robot.subsystems.Drivetrain;
-import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Transport;
+import frc.robot.subsystems.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -30,6 +28,7 @@ public class RobotContainer {
   public static final Transport transport = Transport.getInstance();
   public static final Shooter shooter = Shooter.getInstance();
   public static final Climber climber = Climber.getInstance();
+  public static final Compressor compressor = new Compressor(1, PneumaticsModuleType.REVPH);
 
   // private final ExampleCommand m_autoCommand = new ExampleCommand(m_Drivetrain);
 
@@ -37,6 +36,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
+    compressor.enableDigital();
     drivetrain.setDefaultCommand(new ArcadeDrive());
   }
 
@@ -48,6 +48,10 @@ public class RobotContainer {
    */
   public static final Joystick driverJoystick = new Joystick(0);
 
+  JoystickButton btn3 = new JoystickButton(driverJoystick, 3);
+  JoystickButton btn4 = new JoystickButton(driverJoystick, 4);
+  JoystickButton btn5 = new JoystickButton(driverJoystick, 5);
+  JoystickButton btn6 = new JoystickButton(driverJoystick, 6);
   JoystickButton btn7 = new JoystickButton(driverJoystick, 7);
   JoystickButton btn8 = new JoystickButton(driverJoystick, 8);
   JoystickButton btn9 = new JoystickButton(driverJoystick, 9);
@@ -56,6 +60,10 @@ public class RobotContainer {
   JoystickButton btn12 = new JoystickButton(driverJoystick, 12);
 
   private void configureButtonBindings() {
+    btn3.whenPressed(new compressClimberSol());
+    btn4.whenPressed(new extendClimberSol());
+    btn5.whileHeld(new climbUp());
+    btn6.whileHeld(new climbDown());
     btn7.whileHeld(new intakeIn());
     btn8.whileHeld(new intakeOut());
     btn9.whileHeld(new transportIn());

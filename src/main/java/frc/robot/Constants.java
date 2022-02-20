@@ -48,8 +48,15 @@ public final class Constants {
     public static final int FRONT_RIGHT_MOTOR = 11;
     public static final int BACK_RIGHT_MOTOR = 10;
 
-    public static final int FRONT_LEFT_MOTOR = 13;
+    public static final int FRONT_LEFT_MOTOR = 17; //actually 13
     public static final int BACK_LEFT_MOTOR = 12;
+  }
+
+  public static final class ClimberConstants {
+    public static final int LEFT_SOLENOID = 1;
+    public static final int RIGHT_SOLENOID = 0;
+    public static final int LEFT_LIFT_MOTOR = 18;
+    public static final int RIGHT_LIFT_MOTOR = 19;
   }
 
   public static final class TransportConstants {
