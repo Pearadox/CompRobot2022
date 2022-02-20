@@ -57,12 +57,12 @@ public class Climber extends SubsystemBase {
     setClimbMotor(0);
   }
 
-  public void openSolenoid() {
+  public void climbOpenSol() {
     leftSolenoid.set(true);
     rightSolenoid.set(true);
   }
 
-  public void closeSolenoid() {
+  public void climbCloseSol() {
     leftSolenoid.set(false);
     rightSolenoid.set(false);
   }

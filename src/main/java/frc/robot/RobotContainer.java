@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.*;
@@ -48,6 +49,7 @@ public class RobotContainer {
    */
   public static final Joystick driverJoystick = new Joystick(0);
 
+  JoystickButton btn2 = new JoystickButton(driverJoystick, 2);
   JoystickButton btn3 = new JoystickButton(driverJoystick, 3);
   JoystickButton btn4 = new JoystickButton(driverJoystick, 4);
   JoystickButton btn5 = new JoystickButton(driverJoystick, 5);
@@ -60,6 +62,7 @@ public class RobotContainer {
   JoystickButton btn12 = new JoystickButton(driverJoystick, 12);
 
   private void configureButtonBindings() {
+    btn2.whenPressed(new InstantCommand(intake::intakeOpenSol, intake));
     btn3.whenPressed(new compressClimberSol());
     btn4.whenPressed(new extendClimberSol());
     btn5.whileHeld(new climbUp());
@@ -71,6 +74,7 @@ public class RobotContainer {
     btn11.whileHeld(
       new RunCommand(() -> shooter.setSpeed(0.475), shooter)
     ).whenReleased(() -> shooter.setSpeed(0));
+    btn12.whenPressed(new InstantCommand(intake::intakeToggleSol, intake));
   }
 
   /**
