@@ -53,10 +53,14 @@ public final class Constants {
   }
 
   public static final class ClimberConstants {
-    public static final int LEFT_SOLENOID = 2; //2
-    public static final int RIGHT_SOLENOID = 1; //1
+    // public static final int LEFT_SOLENOID = 2; //2
+    // public static final int RIGHT_SOLENOID = 1; //1
     public static final int LEFT_LIFT_MOTOR = 18;
     public static final int RIGHT_LIFT_MOTOR = 19;
+    public static final int LEFT_FOR_SOLENOID = 2;
+    public static final int LEFT_REV_SOLENOID = 3;
+    public static final int RIGHT_FOR_SOLENOID = 4;
+    public static final int RIGHT_REV_SOLENOID = 5;
   }
 
   public static final class TransportConstants {
@@ -66,7 +70,7 @@ public final class Constants {
 
   public static final class IntakeConstants {
     public static final int INTAKE_MOTOR = 20;
-    public static final int INTAKE_FOR_SOLENOID = 4; //3
-    public static final int INTAKE_REV_SOLENOID = 3; //4
+    public static final int INTAKE_FOR_SOLENOID = 1; //3
+    public static final int INTAKE_REV_SOLENOID = 0; //4
   }
 }

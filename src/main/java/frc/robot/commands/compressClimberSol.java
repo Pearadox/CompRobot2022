@@ -19,6 +19,7 @@ public class compressClimberSol extends InstantCommand {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    
     RobotContainer.climber.climbCloseSol();
   }
 }
