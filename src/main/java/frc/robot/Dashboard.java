@@ -32,6 +32,9 @@ public class Dashboard {
   private static void updatePutShort() {
     RobotContainer.drivetrain.dashboard();
     RobotContainer.intake.dashboard();
+    RobotContainer.shooter.dashboard();
+    RobotContainer.drivetrain.dashboard();
+    RobotContainer.transport.dashboard();
   }
 
   // Things that don't need to be sent out each cycle

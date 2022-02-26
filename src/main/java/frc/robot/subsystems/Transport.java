@@ -16,17 +16,17 @@ public class Transport extends SubsystemBase {
   private static Transport INSTANCE;
 
   private final CANSparkMax topTransportMotor;
-  private final TalonSRX botTransportMotor;
+  private final CANSparkMax botTransportMotor;
 
   /** Creates a new Transport. */
   public Transport() {
     topTransportMotor = new CANSparkMax(TransportConstants.TOP_TRANSPORT_MOTOR, MotorType.kBrushless);
-    botTransportMotor = new TalonSRX(15);
+    botTransportMotor = new CANSparkMax(TransportConstants.BOT_TRANSPORT_MOTOR, MotorType.kBrushless);
   }
 
   public void setSpeed(double speed) {
-    topTransportMotor.set(speed);
-    botTransportMotor.set(ControlMode.PercentOutput, speed);
+    topTransportMotor.set(-speed);
+    botTransportMotor.set(-speed);
   }
 
   public void transportIn() {

@@ -6,13 +6,12 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
 
@@ -27,6 +26,7 @@ public class Intake extends SubsystemBase {
   public Intake() {
     intakeMotor = new TalonFX(IntakeConstants.INTAKE_MOTOR);
     intakeSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, IntakeConstants.INTAKE_FOR_SOLENOID, IntakeConstants.INTAKE_REV_SOLENOID);
+    SmartDashboard.putString("Intake Value", getIntakeValue() + "");
   }
 
 
@@ -35,11 +35,11 @@ public class Intake extends SubsystemBase {
   }
 
   public void setIntakeIn() {
-    setSpeed(0.5);
+    setSpeed(-0.5);
   }
 
   public void setIntakeOut() {
-    setSpeed(-0.5);
+    setSpeed(0.5);
   }
 
   public void intakeOpenSol() {
@@ -51,16 +51,26 @@ public class Intake extends SubsystemBase {
   }
 
   public void intakeToggleSol() {
-    intakeSolenoid.toggle();
+    if(getIntakeValue() == DoubleSolenoid.Value.kOff) {
+      intakeOpenSol();
+    }
+    else {
+      intakeSolenoid.toggle();
+    }
   }
 
-  public void zero() {
+  public Value getIntakeValue() {
+    return intakeSolenoid.get();
+  }
+
+  public void stop() {
     setSpeed(0);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putString("Intake Value", getIntakeValue() + "");
   }
 
   public void dashboard() {}

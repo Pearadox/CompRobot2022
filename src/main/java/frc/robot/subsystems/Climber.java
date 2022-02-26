@@ -4,16 +4,14 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ClimberConstants;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
@@ -22,6 +20,8 @@ public class Climber extends SubsystemBase {
 
   private final TalonFX leftLiftMotor;
   private final TalonFX rightLiftMotor;
+  private Encoder leftLiftEncoder;
+  private Encoder rightLiftEncoder;
   private DoubleSolenoid leftSolenoid;
   private DoubleSolenoid rightSolenoid;
   // private Encoder liftEncoder;
@@ -36,15 +36,23 @@ public class Climber extends SubsystemBase {
     rightLiftMotor = new TalonFX(ClimberConstants.RIGHT_LIFT_MOTOR);
     leftLiftMotor.setNeutralMode(NeutralMode.Brake);
     rightLiftMotor.setNeutralMode(NeutralMode.Brake);
-    // liftMotor = new Encoder
+
     // leftSolenoid = new Solenoid(PneumaticsModuleType.REVPH, ClimberConstants.LEFT_SOLENOID);
     leftSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, ClimberConstants.LEFT_FOR_SOLENOID, ClimberConstants.LEFT_REV_SOLENOID);
     rightSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, ClimberConstants.RIGHT_FOR_SOLENOID, ClimberConstants.RIGHT_REV_SOLENOID);
   }
 
-  public void setClimbMotor(double percent) {
+  public void setLeftLiftMotor(double percent) {
     leftLiftMotor.set(ControlMode.PercentOutput, percent);
+  }
+
+  public void setRightLiftMotor(double percent) {
     rightLiftMotor.set(ControlMode.PercentOutput, -percent);
+  }
+
+  public void setClimbMotor(double percent) {
+    setLeftLiftMotor(percent);
+    setRightLiftMotor(percent);
   }
 
   public void climbUp() {

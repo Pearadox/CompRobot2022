@@ -7,7 +7,6 @@ package frc.robot.subsystems;
 import static frc.robot.Constants.DrivetrainConstants.*;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax.IdleMode;
 
@@ -18,7 +17,6 @@ import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.drivers.PearadoxSparkMax;
 import frc.lib.drivers.PearadoxSparkMax.PearadoxNeo;
 import frc.robot.Constants.DrivetrainConstants;
 

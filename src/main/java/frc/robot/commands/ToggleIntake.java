@@ -4,12 +4,13 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 
-public class intakeIn extends CommandBase {
-  /** Creates a new intakeIn. */
-  public intakeIn() {
+public class ToggleIntake extends CommandBase {
+  /** Creates a new ToggleIntake. */
+  public ToggleIntake() {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(RobotContainer.intake);
   }
@@ -17,7 +18,12 @@ public class intakeIn extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    RobotContainer.intake.setIntakeIn();
+    if(RobotContainer.intake.getIntakeValue() == Value.kReverse || RobotContainer.intake.getIntakeValue() == Value.kOff) {
+      RobotContainer.intake.setSpeed(-0.25);
+    } else{
+      RobotContainer.intake.setSpeed(0.25);
+    }
+    RobotContainer.intake.intakeToggleSol();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
