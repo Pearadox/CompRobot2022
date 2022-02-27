@@ -77,6 +77,6 @@ public final class Constants {
   public static final class ShooterConstants {
     public static final int LEFT_SHOOTER = 31;
     public static final int RIGHT_SHOOTER = 30;
-    public static final double MAXPERCENT = 0.2;
+    public static final double MAXPERCENT = 0.4;
   }
 }

@@ -21,19 +21,23 @@ public class ShooterRampUp extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    curPercentage = RobotContainer.shooter.getPercentOutput();
+    curPercentage = Math.abs(RobotContainer.shooter.getPercentOutput());
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // if(curPercentage < SmartDashboard.getNumber("MaxPercentage", ShooterConstants.MAXPERCENT)) {
-    //   RobotContainer.shooter.setSpeed(curPercentage);
-    //   curPercentage += 0.01;
-    // } else {
-    //   RobotContainer.shooter.setSpeed(ShooterConstants.MAXPERCENT);
-    // }
-    RobotContainer.shooter.setSpeed(SmartDashboard.getNumber("MaxPercentage", ShooterConstants.MAXPERCENT));
+    double error = SmartDashboard.getNumber("MaxPercentage", ShooterConstants.MAXPERCENT) - curPercentage;
+    if(error > 0.05) {
+      RobotContainer.shooter.setSpeed(curPercentage);
+      curPercentage += 0.01;
+    } else if(error < -0.05) {
+      RobotContainer.shooter.setSpeed(curPercentage);
+      curPercentage -= 0.005;
+    } else {
+      RobotContainer.shooter.setSpeed(SmartDashboard.getNumber("MaxPercentage", ShooterConstants.MAXPERCENT));
+    }
+    // RobotContainer.shooter.setSpeed(SmartDashboard.getNumber("MaxPercentage", ShooterConstants.MAXPERCENT));
   }
 
   // Called once the command ends or is interrupted.

@@ -33,7 +33,6 @@ public class Dashboard {
     RobotContainer.drivetrain.dashboard();
     RobotContainer.intake.dashboard();
     RobotContainer.shooter.dashboard();
-    RobotContainer.drivetrain.dashboard();
     RobotContainer.transport.dashboard();
   }
 
