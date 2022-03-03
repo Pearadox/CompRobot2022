@@ -27,9 +27,9 @@ public class Drivetrain extends SubsystemBase {
   public final CANSparkMax leftMotor1 =
       new PearadoxNeo(DrivetrainConstants.FRONT_LEFT_MOTOR, IdleMode.kBrake);
   private final CANSparkMax leftMotor2 =
-      new PearadoxNeo(DrivetrainConstants.BACK_LEFT_MOTOR, IdleMode.kBrake);
+      new PearadoxNeo(DrivetrainConstants.BACK_LEFT_MOTOR, IdleMode.kCoast);
   private final CANSparkMax rightMotor1 =
-      new PearadoxNeo(DrivetrainConstants.FRONT_RIGHT_MOTOR, IdleMode.kCoast);
+      new PearadoxNeo(DrivetrainConstants.FRONT_RIGHT_MOTOR, IdleMode.kBrake);
   private final CANSparkMax rightMotor2 =
       new PearadoxNeo(DrivetrainConstants.BACK_RIGHT_MOTOR, IdleMode.kCoast);
   

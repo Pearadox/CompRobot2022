@@ -5,10 +5,12 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.TransportConstants;
 
@@ -17,11 +19,16 @@ public class Transport extends SubsystemBase {
 
   private final CANSparkMax topTransportMotor;
   private final CANSparkMax botTransportMotor;
+  public TalonFX feeder;
+  // private final TalonFX beterTransportMotor;
+
+  private boolean loading = true;
 
   /** Creates a new Transport. */
   public Transport() {
     topTransportMotor = new CANSparkMax(TransportConstants.TOP_TRANSPORT_MOTOR, MotorType.kBrushless);
     botTransportMotor = new CANSparkMax(TransportConstants.BOT_TRANSPORT_MOTOR, MotorType.kBrushless);
+    feeder = new TalonFX(TransportConstants.BETER_TRANSPORT_MOTOR);
   }
 
   public void setSpeed(double speed) {
@@ -30,7 +37,9 @@ public class Transport extends SubsystemBase {
   }
 
   public void transportIn() {
-    setSpeed(0.5);
+  if (loading){
+    setSpeed(0.3);
+    }
   }
 
   public void transportOut() {
@@ -41,12 +50,34 @@ public class Transport extends SubsystemBase {
     setSpeed(0);
   }
 
+  public void feederShoot(){
+    setSpeed(0.35);
+    feeder.set(ControlMode.PercentOutput, 0.35);
+  }
+
+  public void toggleIntake(){
+    if(loading){
+      loading = false;
+    }
+    else if (!loading){
+      loading = true;
+    }
+  }
+
+  public void feederHold(){
+    feeder.set(ControlMode.PercentOutput, -0.6);
+  }
+
   public void dashboard() {
   }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    SmartDashboard.putNumber("top Transport Current", topTransportMotor.getOutputCurrent());
+    SmartDashboard.putNumber("bot Transport Current", botTransportMotor.getOutputCurrent());
+    SmartDashboard.putNumber("feeder Transport Current", feeder.getSupplyCurrent());
+    SmartDashboard.putBoolean("Loading", loading);
+
   }
 
   public static Transport getInstance() {

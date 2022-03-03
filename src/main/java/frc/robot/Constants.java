@@ -66,6 +66,7 @@ public final class Constants {
   public static final class TransportConstants {
     public static final int TOP_TRANSPORT_MOTOR = 23;
     public static final int BOT_TRANSPORT_MOTOR = 22;
+    public static final int BETER_TRANSPORT_MOTOR = 32;
   }
 
   public static final class IntakeConstants {

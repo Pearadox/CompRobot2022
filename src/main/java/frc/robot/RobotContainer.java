@@ -43,7 +43,7 @@ public class RobotContainer {
     configureButtonBindings();
     compressor.enableAnalog(60, 115);
     drivetrain.setDefaultCommand(new ArcadeDrive());
-    // transport.setDefaultCommand(new transportIn());
+    transport.setDefaultCommand(new RunCommand(transport::feederHold, transport));
     shooter.setDefaultCommand(new ShooterRampUp());
   }
 
@@ -56,6 +56,7 @@ public class RobotContainer {
   public static final Joystick driverJoystick = new Joystick(0);
   private static final Joystick operatorJoystick = new Joystick(1);
 
+  JoystickButton btn1 = new JoystickButton(driverJoystick, 1);
   JoystickButton btn2 = new JoystickButton(driverJoystick, 2);
   JoystickButton btn3 = new JoystickButton(driverJoystick, 3);
   JoystickButton btn4 = new JoystickButton(driverJoystick, 4);
@@ -81,6 +82,8 @@ public class RobotContainer {
   JoystickButton opbtn12 = new JoystickButton(operatorJoystick, 12);
 
   private void configureButtonBindings() {
+    btn1.whileHeld(new RunCommand(transport::feederShoot, transport));
+    btn2.whenPressed(new InstantCommand(transport::toggleIntake, transport));
     btn3.whenPressed(new compressClimberSol());
     btn4.whenPressed(new extendClimberSol());
     btn5.whileHeld(new climbUp());

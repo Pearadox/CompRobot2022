@@ -34,8 +34,12 @@ public class Intake extends SubsystemBase {
     intakeMotor.set(ControlMode.PercentOutput, speed);
   }
 
-  public void setIntakeIn() {
-    setSpeed(-0.5);
+  public void setIntakeIn(double speed) {
+    setSpeed(-speed);
+  }
+
+  public double getIntakeCurrent(){
+    return intakeMotor.getSupplyCurrent();
   }
 
   public void setIntakeOut() {
@@ -71,6 +75,7 @@ public class Intake extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putString("Intake Value", getIntakeValue() + "");
+    SmartDashboard.putNumber("intake current", intakeMotor.getSupplyCurrent());
   }
 
   public void dashboard() {}
