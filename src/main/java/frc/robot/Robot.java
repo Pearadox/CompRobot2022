@@ -7,8 +7,10 @@ package frc.robot;
 import com.revrobotics.REVPhysicsSim;
 
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -34,6 +36,8 @@ public class Robot extends TimedRobot {
   public static final String _drive = "DRIVE";
   public static final String drivetrain = "DRIVETRAIN";
   public static final String intake = "INTAKE";
+
+  public SendableChooser<Boolean> llSwitch = new SendableChooser<>();
 
   public enum RobotState {
     DISABLED,
@@ -61,7 +65,11 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    
+    llSwitch.addOption("On", true);
+    llSwitch.addOption("Off", false);
+    llSwitch.setDefaultOption("On", true);
+    SendableRegistry.setName(llSwitch, "Limelight Switch");
+    SmartDashboard.putData(llSwitch);
   }
 
   /**
@@ -79,6 +87,8 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
     SmartDashboard.putNumber("Pressure", RobotContainer.compressor.getPressure());
+    RobotContainer.pdh.setSwitchableChannel(llSwitch.getSelected());
+    
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

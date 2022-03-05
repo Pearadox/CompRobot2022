@@ -10,8 +10,8 @@ import frc.robot.RobotContainer;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class extendClimberSol extends InstantCommand {
-  public extendClimberSol() {
+public class ExtendClimberSol extends InstantCommand {
+  public ExtendClimberSol() {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(RobotContainer.climber);
   }

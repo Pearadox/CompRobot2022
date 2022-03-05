@@ -16,7 +16,7 @@ public class PearadoxSparkMax extends CANSparkMax {
   public static class PearadoxNeo extends PearadoxSparkMax {
     public PearadoxNeo(
       int deviceNumber, IdleMode i_mode) {
-    super(deviceNumber, MotorType.kBrushless, i_mode, 30);  
+    super(deviceNumber, MotorType.kBrushless, i_mode, 40);  
     // this.restoreFactoryDefaults();
     // this.enableVoltageCompensation(12.0);
 

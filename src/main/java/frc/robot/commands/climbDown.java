@@ -7,9 +7,9 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 
-public class climbDown extends CommandBase {
+public class ClimbDown extends CommandBase {
   /** Creates a new climbDown. */
-  public climbDown() {
+  public ClimbDown() {
     // Use addRequirements() here to declare subsystem dependencies.
   }
 

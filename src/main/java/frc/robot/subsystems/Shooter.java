@@ -10,8 +10,16 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
+import edu.wpi.first.math.filter.MedianFilter;
+import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.drivers.LimeLight;
+import frc.lib.util.LerpTable;
 import frc.robot.Constants.ShooterConstants;
 
 public class Shooter extends SubsystemBase {
@@ -24,6 +32,11 @@ public class Shooter extends SubsystemBase {
   private double highGoal = 0.65;
   private double prevGoal = highGoal;
 
+  private MedianFilter tyFilter = new MedianFilter(5);
+  private NetworkTable llTable = NetworkTableInstance.getDefault().getTable("limelight");
+  private LerpTable shooterLerp = new LerpTable();
+  private SlewRateLimiter shooterLimiter = new SlewRateLimiter(10);
+  private double target = 0;
 
   /** Creates a new Shooter. */
   public Shooter() {
@@ -31,9 +44,16 @@ public class Shooter extends SubsystemBase {
     rightShooter.setNeutralMode(NeutralMode.Coast);
     leftShooter.setInverted(InvertType.InvertMotorOutput);
     if(!SmartDashboard.containsKey("MaxPercentage")) SmartDashboard.putNumber("MaxPercentage", ShooterConstants.MAXPERCENT);
-    limitCurrent = new SupplyCurrentLimitConfiguration(true, 80, 60, 1);
+    if(!SmartDashboard.containsKey("SetVoltage")) SmartDashboard.putNumber("SetVoltage", 0);
+    limitCurrent = new SupplyCurrentLimitConfiguration(true, 60, 60, 1);
     leftShooter.configSupplyCurrentLimit(limitCurrent);
     rightShooter.configSupplyCurrentLimit(limitCurrent);
+    shooterLerp.addPoint(22.1, 7.3);
+    shooterLerp.addPoint(5, 7.4);
+    shooterLerp.addPoint(-1.3, 8.2);
+    shooterLerp.addPoint(-8.45, 8.85);
+    shooterLerp.addPoint(-13.2, 9.75);
+    shooterLerp.addPoint(-16.7, 10.45);
   }
 
   public double getPreviousGoal() {
@@ -52,6 +72,14 @@ public class Shooter extends SubsystemBase {
     return highGoal;
   }
 
+  public void setVoltage(double voltage) {
+    leftShooter.set(ControlMode.PercentOutput, -voltage/leftShooter.getBusVoltage());
+    rightShooter.set(ControlMode.PercentOutput, -voltage/rightShooter.getBusVoltage());
+  }
+
+  public void autoSpeed() {
+    setVoltage(target);
+  }
 
   //Negative is Out, Positive is In
   public void setSpeed(double speed) {
@@ -64,8 +92,6 @@ public class Shooter extends SubsystemBase {
   }
 
   public void dashboard() {
-    SmartDashboard.putNumber("Shooter PercentOutput", getPercentOutput());
-    SmartDashboard.putNumber("Shooter Current", leftShooter.getSupplyCurrent());
   }
 
   @Override
@@ -74,11 +100,19 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putNumber("Shooter PercentOutput", getPercentOutput());
     SmartDashboard.putNumber("Shooter Current", leftShooter.getSupplyCurrent());
     SmartDashboard.putNumber("Shooter Temp", leftShooter.getTemperature());
+    SmartDashboard.putNumber("Shooter Bus Voltage", leftShooter.getBusVoltage());
     // if(leftShooter.getTemperature() > 50) {
     // limitCurrent = new SupplyCurrentLimitConfiguration(true, 15, 15, 2);
     // leftShooter.configSupplyCurrentLimit(limitCurrent);
     // rightShooter.configSupplyCurrentLimit(limitCurrent);
     // }
+
+    if (llTable.getEntry("ta").getDouble(0) > 0) {
+      double ty = tyFilter.calculate(llTable.getEntry("ty").getDouble(0));
+      target = shooterLimiter.calculate(shooterLerp.interpolate(ty));
+    } else {
+      tyFilter.reset();
+    }
   }
 
   public static Shooter getInstance() {

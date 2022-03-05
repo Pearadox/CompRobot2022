@@ -15,8 +15,8 @@ public class Outtake extends ParallelCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      new intakeOut(),
-      new transportOut()
+      new IntakeOut(),
+      new TransportOut()
     );
   }
 }

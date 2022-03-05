@@ -41,7 +41,7 @@ public class Drivetrain extends SubsystemBase {
   private Drivetrain() {
 
     // rightMotor2.setInverted(true);
-    // leftMotor2.setInverted(true);
+    leftMotor1.setInverted(true);
 
     leftMotor2.follow(leftMotor1);
     rightMotor2.follow(rightMotor1);
@@ -87,17 +87,16 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public void arcadeDrive(double throttle, double twist) {
-    if (throttle < 0.1 && throttle > -0.1) {
+    if (Math.abs(throttle) < 0.1) {
       throttle = 0;
     }
-    if (twist < 0.15 && twist > -0.15) {
+    if (Math.abs(twist) < 0.15) {
       twist = 0;
     }
 
-    double leftOutput = Math.sin(throttle + twist) * Math.pow(throttle + twist, 2);
-    double rightOutput = Math.sin(throttle - twist) * Math.pow(throttle - twist, 2);
-
-    setSpeed(-leftOutput * 0.75, rightOutput * 0.75);
+    throttle *= Math.abs(throttle);
+    twist *= Math.abs(twist);
+    setVoltages(12 * (throttle + twist), 12 * (throttle - twist));
   }
 
   private final DifferentialDriveOdometry m_odometry =

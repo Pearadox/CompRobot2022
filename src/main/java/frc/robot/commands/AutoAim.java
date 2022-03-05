@@ -4,31 +4,40 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 
-public class TransportOut extends CommandBase {
-  /** Creates a new intakeIn. */
-  public TransportOut() {
+public class AutoAim extends CommandBase {
+  public NetworkTable llTable = NetworkTableInstance.getDefault().getTable("limelight");
+  /** Creates a new AutoAim. */
+  public AutoAim() {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(RobotContainer.transport);
+    addRequirements(RobotContainer.drivetrain);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    RobotContainer.transport.transportOut();
+    double kS = 0.02;
+    double kP = 0.08;
+    double error = llTable.getEntry("tx").getDouble(0);
+    RobotContainer.drivetrain.setVoltages(kS * Math.signum(error) + kP * error, -kP * error - kS * Math.signum(error));
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    RobotContainer.transport.transportStop();
+
   }
 
   // Returns true when the command should end.

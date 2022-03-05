@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -34,6 +35,7 @@ public class RobotContainer {
   public static final Shooter shooter = Shooter.getInstance();
   public static final Climber climber = Climber.getInstance();
   public static final Compressor compressor = new Compressor(1, PneumaticsModuleType.REVPH);
+  public static final PowerDistribution pdh = new PowerDistribution();
 
   // private final ExampleCommand m_autoCommand = new ExampleCommand(m_Drivetrain);
   // dania stinks
@@ -43,8 +45,9 @@ public class RobotContainer {
     configureButtonBindings();
     compressor.enableAnalog(60, 115);
     drivetrain.setDefaultCommand(new ArcadeDrive());
-    transport.setDefaultCommand(new RunCommand(transport::feederHold, transport));
-    shooter.setDefaultCommand(new ShooterRampUp());
+    transport.setDefaultCommand(new TransportIn());
+    shooter.setDefaultCommand(new ShooterRampUpVoltage());
+    intake.setDefaultCommand(new IntakeIn());
   }
 
   /**
@@ -82,29 +85,31 @@ public class RobotContainer {
   JoystickButton opbtn12 = new JoystickButton(operatorJoystick, 12);
 
   private void configureButtonBindings() {
-    btn1.whileHeld(new RunCommand(transport::feederShoot, transport));
-    btn2.whenPressed(new InstantCommand(transport::toggleIntake, transport));
-    btn3.whenPressed(new compressClimberSol());
-    btn4.whenPressed(new extendClimberSol());
-    btn5.whileHeld(new climbUp());
-    btn6.whileHeld(new climbDown());
-    btn7.whileHeld(new intakeIn());
+    btn1.whileHeld(new RunCommand(transport::feederShoot, transport)).whenReleased(
+      new InstantCommand(transport::transportStop, transport).andThen(transport::clearBall, transport)
+    );
+    btn2.whileHeld(new AutoAim());
+    btn3.whenPressed(new CompressClimberSol());
+    btn4.whenPressed(new ExtendClimberSol());
+    btn5.whileHeld(new ClimbUp());
+    btn6.whileHeld(new ClimbDown());
+    btn7.whileHeld(new IntakeIn());
     btn8.whileHeld(new Outtake());
-    btn9.whileHeld(new transportIn());
-    btn10.whileHeld(new transportOut());
+    // btn9.whileHeld(new transportIn());
+    btn10.whileHeld(new TransportOut());
     btn11.whileHeld(new InstantCommand(() -> {
       shooter.setPreviousGoal();
       SmartDashboard.putNumber("MaxPercentage", shooter.getLow());
     }, shooter).andThen(new ShooterRampUp())).whenReleased(new InstantCommand(() -> {
       SmartDashboard.putNumber("MaxPercentage", shooter.getPreviousGoal());
     }, shooter));
-    btn12.whenPressed(new ToggleIntake().withTimeout(0.25));
+    btn12.whenPressed(new ToggleIntake().withTimeout(0.4));
 
     opbtn2.whenPressed(new ClimberZero());
-    opbtn3.whenPressed(new compressClimberSol());
-    opbtn4.whenPressed(new extendClimberSol());
-    opbtn5.whileHeld(new climbUp());
-    opbtn6.whileHeld(new climbDown());
+    opbtn3.whenPressed(new CompressClimberSol());
+    opbtn4.whenPressed(new ExtendClimberSol());
+    opbtn5.whileHeld(new ClimbUp());
+    opbtn6.whileHeld(new ClimbDown());
     opbtn11.whenPressed(new InstantCommand(
       () -> {
         climber.reset();
@@ -165,6 +170,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return null;
+    return new SimpleLowAuton();
   }
 }

@@ -5,6 +5,8 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 
@@ -27,6 +29,8 @@ public class Intake extends SubsystemBase {
     intakeMotor = new TalonFX(IntakeConstants.INTAKE_MOTOR);
     intakeSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, IntakeConstants.INTAKE_FOR_SOLENOID, IntakeConstants.INTAKE_REV_SOLENOID);
     SmartDashboard.putString("Intake Value", getIntakeValue() + "");
+    intakeMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 30, 30, 1));
+    intakeMotor.setNeutralMode(NeutralMode.Coast);
   }
 
 
@@ -53,13 +57,13 @@ public class Intake extends SubsystemBase {
   public void intakeCloseSol() {
     intakeSolenoid.set(Value.kReverse);
   }
-
+  
   public void intakeToggleSol() {
-    if(getIntakeValue() == DoubleSolenoid.Value.kOff) {
+    if(getIntakeValue() == DoubleSolenoid.Value.kOff || getIntakeValue() == DoubleSolenoid.Value.kReverse) {
       intakeOpenSol();
     }
     else {
-      intakeSolenoid.toggle();
+      intakeCloseSol();
     }
   }
 
@@ -76,6 +80,7 @@ public class Intake extends SubsystemBase {
     // This method will be called once per scheduler run
     SmartDashboard.putString("Intake Value", getIntakeValue() + "");
     SmartDashboard.putNumber("intake current", intakeMotor.getSupplyCurrent());
+    SmartDashboard.putNumber("Intake Temp", intakeMotor.getTemperature());
   }
 
   public void dashboard() {}

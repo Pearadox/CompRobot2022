@@ -3,9 +3,9 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 
-public class climbUp extends CommandBase {
+public class ClimbUp extends CommandBase {
   /** Creates a new climbUp command - shortens the elevators to lift the robot*/
-  public climbUp() {
+  public ClimbUp() {
     // Use addRequirements() here to declare subsystem dependencies.
   }
 

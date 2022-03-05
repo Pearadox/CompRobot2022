@@ -4,14 +4,15 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 
-public class intakeIn extends CommandBase {
+public class IntakeIn extends CommandBase {
   /** Creates a new intakeIn. */
-  public intakeIn() {
+  public IntakeIn() {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(RobotContainer.intake);
   }
@@ -25,7 +26,12 @@ public class intakeIn extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    RobotContainer.intake.setIntakeIn(0.5);
+    if (RobotContainer.intake.getIntakeValue() == Value.kForward) {
+      RobotContainer.intake.setIntakeIn(0.35);
+    } else {
+      RobotContainer.intake.stop();
+    }
+      
   }
 
   // Called once the command ends or is interrupted.
