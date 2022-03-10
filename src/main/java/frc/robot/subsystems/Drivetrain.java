@@ -24,6 +24,8 @@ public class Drivetrain extends SubsystemBase {
   /** Creates a new Drivetrain. */
   private static Drivetrain INSTANCE;
 
+  
+
   public final CANSparkMax leftMotor1 =
       new PearadoxNeo(DrivetrainConstants.FRONT_LEFT_MOTOR, IdleMode.kBrake);
   private final CANSparkMax leftMotor2 =
@@ -42,6 +44,7 @@ public class Drivetrain extends SubsystemBase {
 
     // rightMotor2.setInverted(true);
     leftMotor1.setInverted(true);
+    rightMotor1.setInverted(false);
 
     leftMotor2.follow(leftMotor1);
     rightMotor2.follow(rightMotor1);

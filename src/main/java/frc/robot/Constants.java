@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
+
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.util.Units;
 
@@ -16,6 +18,8 @@ import edu.wpi.first.math.util.Units;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+  public static final int TIMEOUT = 30;
+
   public static final class DrivetrainConstants {
     public static final double kS = 0.16734; // Volts
     public static final double kV = 2.6713; // Volt Seconds per Meter
@@ -50,6 +54,8 @@ public final class Constants {
 
     public static final int FRONT_LEFT_MOTOR = 18;
     public static final int BACK_LEFT_MOTOR = 19;
+
+    
   }
 
   public static final class ClimberConstants {
@@ -61,6 +67,19 @@ public final class Constants {
     public static final int LEFT_REV_SOLENOID = 2;
     public static final int RIGHT_FOR_SOLENOID = 6;
     public static final int RIGHT_REV_SOLENOID = 7;
+    public static final int LEFT_EXTEND = -169000;
+    public static final int LEFT_MID = -157000;
+    public static final int LEFT_CLIMB = -11000;
+    public static final int RIGHT_EXTEND = 169000;
+    public static final int RIGHT_MID = 157000;
+    public static final int RIGHT_CLIMB = 11000;
+    public static boolean kLeftSensorPhase = true;
+    public static boolean kLeftMotorInvert = false;
+    public static boolean kRightSensorPhase = true;
+    public static boolean kRightMotorInvert = false;
+    public static final int kPIDLoopIdx = 0;
+    public static final int kSlotIdx = 0;
+    public static final double kP = 0.15;
   }
 
   public static final class TransportConstants {
@@ -80,4 +99,6 @@ public final class Constants {
     public static final int RIGHT_SHOOTER = 30;
     public static final double MAXPERCENT = 0.4;
   }
+
+  public static int kTimeoutMs;
 }

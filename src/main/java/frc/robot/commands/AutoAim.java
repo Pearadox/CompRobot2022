@@ -28,7 +28,7 @@ public class AutoAim extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double kS = 0.02;
+    double kS = 0.3;
     double kP = 0.08;
     double error = llTable.getEntry("tx").getDouble(0);
     RobotContainer.drivetrain.setVoltages(kS * Math.signum(error) + kP * error, -kP * error - kS * Math.signum(error));

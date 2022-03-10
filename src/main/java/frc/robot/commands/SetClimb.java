@@ -4,44 +4,40 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.RobotContainer;
 
-public class TransportIn extends CommandBase {
-  /** Creates a new intakeIn. */
-  double start;
-
-  public TransportIn() {
+public class SetClimb extends CommandBase {
+  /** Creates a new SetClimb. */
+  public SetClimb() {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(RobotContainer.transport);
+    addRequirements(RobotContainer.climber);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    start = Timer.getFPGATimestamp();
+    RobotContainer.climber.setLeftPosition(Constants.ClimberConstants.LEFT_CLIMB);
+    RobotContainer.climber.setRightPosition(Constants.ClimberConstants.RIGHT_CLIMB);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-    RobotContainer.transport.transportIn();
-    RobotContainer.transport.feederHold();
-    if (Timer.getFPGATimestamp() - start > .5 && RobotContainer.transport.feeder.getSupplyCurrent() > 5.5) {
-      RobotContainer.transport.detectBall();
-    }
-  }
+  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    RobotContainer.transport.transportStop();
+    
+    RobotContainer.climber.setLeftLiftMotor(0);
+    RobotContainer.climber.setRightLiftMotor(0);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    
+    return ((Math.abs(RobotContainer.climber.getLeftError()) < 100) && (Math.abs(RobotContainer.climber.getRightError()) < 100));
   }
 }

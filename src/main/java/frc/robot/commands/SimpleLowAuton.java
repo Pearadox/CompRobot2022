@@ -21,7 +21,7 @@ public class SimpleLowAuton extends SequentialCommandGroup {
       new RunCommand(() -> RobotContainer.shooter.setVoltage(3), RobotContainer.shooter).alongWith(
         new RunCommand(() -> RobotContainer.transport.feederShoot() , RobotContainer.transport)
       ).withTimeout(2),
-      new RunCommand(() -> RobotContainer.drivetrain.setVoltages(3, 3), RobotContainer.drivetrain).withTimeout(2),
+      new RunCommand(() -> RobotContainer.drivetrain.setVoltages(4, 4), RobotContainer.drivetrain).withTimeout(2),
       new RunCommand(() -> RobotContainer.drivetrain.setVoltages(0, 0))
     );
   }

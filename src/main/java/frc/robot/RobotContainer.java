@@ -18,8 +18,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.lib.drivers.EForwardableConnections;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.Shooter.Mode;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -42,6 +44,7 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
+    portForwarding();
     configureButtonBindings();
     compressor.enableAnalog(60, 115);
     drivetrain.setDefaultCommand(new ArcadeDrive());
@@ -72,6 +75,7 @@ public class RobotContainer {
   JoystickButton btn11 = new JoystickButton(driverJoystick, 11);
   JoystickButton btn12 = new JoystickButton(driverJoystick, 12);
 
+  JoystickButton opbtn1 = new JoystickButton(operatorJoystick, 1);
   JoystickButton opbtn2 = new JoystickButton(operatorJoystick, 2);
   JoystickButton opbtn3 = new JoystickButton(operatorJoystick, 3);
   JoystickButton opbtn4 = new JoystickButton(operatorJoystick, 4);
@@ -89,62 +93,61 @@ public class RobotContainer {
       new InstantCommand(transport::transportStop, transport).andThen(transport::clearBall, transport)
     );
     btn2.whileHeld(new AutoAim());
-    btn3.whenPressed(new CompressClimberSol());
-    btn4.whenPressed(new ExtendClimberSol());
-    btn5.whileHeld(new ClimbUp());
-    btn6.whileHeld(new ClimbDown());
-    btn7.whileHeld(new IntakeIn());
+    // btn3.whenPressed(new CompressClimberSol());
+    btn4.whileHeld(new SetClimb());
+    btn5.whileHeld(new SetMidRung());
+    btn6.whileHeld(new SetExtend());
+    btn7.whenPressed(new ToggleIntake().withTimeout(0.4));
     btn8.whileHeld(new Outtake());
-    // btn9.whileHeld(new transportIn());
-    btn10.whileHeld(new TransportOut());
-    btn11.whileHeld(new InstantCommand(() -> {
-      shooter.setPreviousGoal();
-      SmartDashboard.putNumber("MaxPercentage", shooter.getLow());
-    }, shooter).andThen(new ShooterRampUp())).whenReleased(new InstantCommand(() -> {
-      SmartDashboard.putNumber("MaxPercentage", shooter.getPreviousGoal());
-    }, shooter));
-    btn12.whenPressed(new ToggleIntake().withTimeout(0.4));
+    btn9.whenPressed(new ExtendClimberSol());
+    btn10.whenPressed(new CompressClimberSol());
+    btn11.whenPressed(new InstantCommand(() -> shooter.setMode(Mode.kFixedLow)));
+    btn12.whenPressed(new InstantCommand(() -> shooter.setMode(Mode.kAuto))); 
 
-    opbtn2.whenPressed(new ClimberZero());
-    opbtn3.whenPressed(new CompressClimberSol());
-    opbtn4.whenPressed(new ExtendClimberSol());
-    opbtn5.whileHeld(new ClimbUp());
-    opbtn6.whileHeld(new ClimbDown());
-    opbtn11.whenPressed(new InstantCommand(
-      () -> {
-        climber.reset();
-      }, climber));
-    opbtn7.whileHeld(new RunCommand(
+    opbtn1.whenPressed(new ClimberZero());
+    opbtn2.whenPressed(new InstantCommand(() -> shooter.setMode(Mode.kAuto)));
+    opbtn3.whileHeld(new RunCommand(
       () -> {
       climber.setLeftLiftMotor(-0.35);
     }, climber)).whenReleased(new RunCommand(
       () -> {
       climber.setLeftLiftMotor(0.0);
     }, climber));
-
-    opbtn8.whileHeld(new RunCommand(
+    opbtn4.whileHeld(new RunCommand(
       () -> {
       climber.setRightLiftMotor(-0.35);
     }, climber)).whenReleased(new RunCommand(
       () -> {
       climber.setRightLiftMotor(0.0);
     }, climber));
-
-    opbtn9.whileHeld(new RunCommand(
+    opbtn5.whileHeld(new RunCommand(
       () -> {
       climber.setLeftLiftMotor(0.35);
     }, climber)).whenReleased(new RunCommand(
       () -> {
       climber.setLeftLiftMotor(0.0);
     }, climber));
-
-    opbtn10.whileHeld(new RunCommand(
+    opbtn6.whileHeld(new RunCommand(
       () -> {
       climber.setRightLiftMotor(0.35);
     }, climber)).whenReleased(new RunCommand(
       () -> {
       climber.setRightLiftMotor(0.0);
     }, climber));
+    opbtn7.whileHeld(new ClimbUp());
+    opbtn8.whileHeld(new ClimbDown());
+    opbtn9.whenPressed(new ExtendClimberSol());
+    opbtn10.whenPressed(new CompressClimberSol());
+    opbtn11.whenPressed(new InstantCommand(() -> shooter.setMode(Mode.kFixedLow)));
+    opbtn12.whenPressed(new InstantCommand(() -> shooter.setMode(Mode.kFixedHigh)));
+
+    // opbtn12.whileHeld(new SetMidRung());
+    // opbtn11.whenPressed(new InstantCommand(
+    //   () -> {
+    //     climber.reset();
+    //   }, climber));
+    
+    
 
     // opbtn11.whileHeld(new RunCommand(
     //   () -> {
@@ -171,5 +174,9 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
     return new SimpleLowAuton();
+  }
+  private void portForwarding() {
+    EForwardableConnections.addPortForwarding(EForwardableConnections.LIMELIGHT_CAMERA_FEED);
+    EForwardableConnections.addPortForwarding(EForwardableConnections.LIMELIGHT_WEB_VIEW);
   }
 }

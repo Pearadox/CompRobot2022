@@ -27,7 +27,7 @@ public class IntakeIn extends CommandBase {
   @Override
   public void execute() {
     if (RobotContainer.intake.getIntakeValue() == Value.kForward) {
-      RobotContainer.intake.setIntakeIn(0.35);
+      RobotContainer.intake.setIntakeIn(0.5);
     } else {
       RobotContainer.intake.stop();
     }
