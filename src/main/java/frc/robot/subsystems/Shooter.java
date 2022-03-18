@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.fasterxml.jackson.databind.ser.std.NumberSerializers.ShortSerializer;
 
 import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -60,10 +61,13 @@ public class Shooter extends SubsystemBase {
     rightShooter.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 20, Constants.TIMEOUT);
 
     // LOOKUP TABLE (LIMELIGHT TY, VOLTAGE)
-    shooterLerp.addPoint(14.4, 5.08);
-    shooterLerp.addPoint(-3, 5.175);
-    shooterLerp.addPoint(-9.8, 5.85);
-    shooterLerp.addPoint(-15, 7.0875);
+    shooterLerp.addPoint(10, 3.225);
+    shooterLerp.addPoint(6, 3.225);    
+    shooterLerp.addPoint(1, 3.6);
+    shooterLerp.addPoint(0, 5.0);
+    shooterLerp.addPoint(-2, 5.1);
+    shooterLerp.addPoint(-10, 5.75);
+    shooterLerp.addPoint(-16, 6.1);
   }
 
   public void setMode(Mode mode) {
