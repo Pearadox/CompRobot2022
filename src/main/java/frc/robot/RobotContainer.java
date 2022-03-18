@@ -4,18 +4,26 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
+import java.io.IOException;
+import java.nio.file.Path;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.RamseteController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.lib.drivers.EForwardableConnections;
@@ -38,6 +46,7 @@ public class RobotContainer {
   public static final Climber climber = Climber.getInstance();
   public static final Compressor compressor = new Compressor(1, PneumaticsModuleType.REVPH);
   public static final PowerDistribution pdh = new PowerDistribution();
+  SendableChooser<String> auton = new SendableChooser<>();
 
   // private final ExampleCommand m_autoCommand = new ExampleCommand(m_Drivetrain);
   // dania stinks
@@ -51,6 +60,13 @@ public class RobotContainer {
     transport.setDefaultCommand(new TransportIn());
     shooter.setDefaultCommand(new ShooterRampUpVoltage());
     intake.setDefaultCommand(new IntakeIn());
+    SmartDashboard.putData("Auton Chooser", auton);
+
+    auton.addOption("TwoMeters", "TwoMeters");
+    auton.addOption("RightBack", "RightBack");
+    auton.addOption("TestArc", "TestArc");
+    
+
   }
 
   /**
@@ -93,7 +109,12 @@ public class RobotContainer {
       new InstantCommand(transport::transportStop, transport).andThen(transport::clearBall, transport)
     );
     btn2.whileHeld(new AutoAim());
-    // btn3.whenPressed(new CompressClimberSol());
+    btn3.toggleWhenPressed(
+      new RunCommand(() -> transport.transportStop(), transport).alongWith(
+        new RunCommand(() -> shooter.setSpeed(0), shooter), 
+        new RunCommand(intake::stop, intake)
+      ) 
+    );
     btn4.whileHeld(new SetClimb());
     btn5.whileHeld(new SetMidRung());
     btn6.whileHeld(new SetExtend());
@@ -104,7 +125,7 @@ public class RobotContainer {
     btn11.whenPressed(new InstantCommand(() -> shooter.setMode(Mode.kFixedLow)));
     btn12.whenPressed(new InstantCommand(() -> shooter.setMode(Mode.kAuto))); 
 
-    opbtn1.whenPressed(new ClimberZero());
+    opbtn1.whenPressed(climber::incrementSequence);
     opbtn2.whenPressed(new InstantCommand(() -> shooter.setMode(Mode.kAuto)));
     opbtn3.whileHeld(new RunCommand(
       () -> {
@@ -119,7 +140,7 @@ public class RobotContainer {
     }, climber)).whenReleased(new RunCommand(
       () -> {
       climber.setRightLiftMotor(0.0);
-    }, climber));
+    }, climber)); 
     opbtn5.whileHeld(new RunCommand(
       () -> {
       climber.setLeftLiftMotor(0.35);
@@ -134,11 +155,11 @@ public class RobotContainer {
       () -> {
       climber.setRightLiftMotor(0.0);
     }, climber));
-    opbtn7.whileHeld(new ClimbUp());
-    opbtn8.whileHeld(new ClimbDown());
+    opbtn8.whileHeld(new ClimbUp());
+    opbtn7.whileHeld(new ClimbDown());
     opbtn9.whenPressed(new ExtendClimberSol());
     opbtn10.whenPressed(new CompressClimberSol());
-    opbtn11.whenPressed(new InstantCommand(() -> shooter.setMode(Mode.kFixedLow)));
+    opbtn11.whenPressed(climber::resetSequence);
     opbtn12.whenPressed(new InstantCommand(() -> shooter.setMode(Mode.kFixedHigh)));
 
     // opbtn12.whileHeld(new SetMidRung());
@@ -166,14 +187,49 @@ public class RobotContainer {
     // }, shooter));
   }
 
+  public Command makeRamseteCommand(String path) {
+    Path _path = Filesystem.getDeployDirectory().toPath().resolve("output/" + path + ".wpilib.json");
+    try {
+      RamseteCommand command = new RamseteCommand(
+        TrajectoryUtil.fromPathweaverJson(_path), 
+        drivetrain::getPose, 
+        new RamseteController(Constants.DrivetrainConstants.kRamseteB, Constants.DrivetrainConstants.kRamseteZeta), 
+        new SimpleMotorFeedforward(Constants.DrivetrainConstants.kS, Constants.DrivetrainConstants.kV, Constants.DrivetrainConstants.kA), 
+        Constants.DrivetrainConstants.KINEMATICS, 
+        drivetrain::getWheelSpeeds, 
+        new PIDController(0, 0, 0), 
+        new PIDController(0, 0, 0), 
+        drivetrain::setVoltages,
+        drivetrain);
+      return command;
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    return null;
+  }
+
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
+   * @throws IOException
    */
-  public Command getAutonomousCommand() {
-    // An ExampleCommand will run in autonomous
-    return new SimpleLowAuton();
+  public Command getAutonomousCommand() throws IOException {
+    Path path = Filesystem.getDeployDirectory().toPath().resolve("output/" + "RightBack" + ".wpilib.json");
+    Trajectory trajectory = TrajectoryUtil.fromPathweaverJson(path);
+    drivetrain.resetOdometry(trajectory.getInitialPose());
+    return new ToggleIntake().withTimeout(0.4)
+        .andThen(new InstantCommand(() -> shooter.setMode(Mode.kAuto)))
+        .andThen(new InstantCommand(() -> RobotContainer.intake.setIntakeIn(0.5)))
+        .andThen(makeRamseteCommand("RightBack"))
+        .andThen(new AutoAim().withTimeout(1))
+        .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(3))
+        .andThen(makeRamseteCommand("Right1"))
+        .andThen(makeRamseteCommand("Right2"))
+        .andThen(new ToggleIntake().withTimeout(0.4))
+        .andThen(new AutoAim().withTimeout(1))
+        .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(3));
   }
   private void portForwarding() {
     EForwardableConnections.addPortForwarding(EForwardableConnections.LIMELIGHT_CAMERA_FEED);

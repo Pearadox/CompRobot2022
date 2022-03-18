@@ -4,11 +4,14 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 
 public class SetClimb extends CommandBase {
+  double initialTime;
+
   /** Creates a new SetClimb. */
   public SetClimb() {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -18,13 +21,18 @@ public class SetClimb extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    RobotContainer.climber.setLeftPosition(Constants.ClimberConstants.LEFT_CLIMB);
-    RobotContainer.climber.setRightPosition(Constants.ClimberConstants.RIGHT_CLIMB);
+    initialTime = Timer.getFPGATimestamp();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    if (Timer.getFPGATimestamp() - initialTime < 0.25) {
+      RobotContainer.climber.setClimbMotor(0.5);
+    } else {
+      RobotContainer.climber.setClimbMotor(1);
+    }
+  }
 
   // Called once the command ends or is interrupted.
   @Override
@@ -37,7 +45,7 @@ public class SetClimb extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    
-    return ((Math.abs(RobotContainer.climber.getLeftError()) < 100) && (Math.abs(RobotContainer.climber.getRightError()) < 100));
+    // return RobotContainer.climber.getLeftLiftEncoder() > 0 && RobotContainer.climber.getRightLiftEncoder() > 0;
+    return false;
   }
 }

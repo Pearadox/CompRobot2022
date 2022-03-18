@@ -59,10 +59,11 @@ public class Shooter extends SubsystemBase {
     leftShooter.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 20, Constants.TIMEOUT);
     rightShooter.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 20, Constants.TIMEOUT);
 
-    shooterLerp.addPoint(14.4, 5.635);
-    shooterLerp.addPoint(-3, 5.75);
-    shooterLerp.addPoint(-9.8, 6.5);
-    shooterLerp.addPoint(-15, 7.875);
+    // LOOKUP TABLE (LIMELIGHT TY, VOLTAGE)
+    shooterLerp.addPoint(14.4, 5.08);
+    shooterLerp.addPoint(-3, 5.175);
+    shooterLerp.addPoint(-9.8, 5.85);
+    shooterLerp.addPoint(-15, 7.0875);
   }
 
   public void setMode(Mode mode) {
@@ -92,7 +93,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void autoSpeed() {
-    setVoltage(0.9 * target);
+    setVoltage(target);
   }
 
   //Negative is Out, Positive is In
@@ -103,6 +104,10 @@ public class Shooter extends SubsystemBase {
 
   public double getPercentOutput() {
     return (leftShooter.getMotorOutputPercent() + rightShooter.getMotorOutputPercent())/2;
+  }
+
+  public void setLeds(int state) {
+    llTable.getEntry("ledMode").setNumber(state);
   }
 
 
@@ -117,6 +122,8 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putNumber("Shooter Temp", leftShooter.getTemperature());
     SmartDashboard.putNumber("Shooter Bus Voltage", leftShooter.getBusVoltage());
     SmartDashboard.putString("Shooter Mode", mode.toString());
+    SmartDashboard.putNumber("Shooter RPM", leftShooter.getSelectedSensorVelocity() / 204.8);
+    SmartDashboard.putNumber("Target", target);
 
     // if(leftShooter.getTemperature() > 50) {
     // limitCurrent = new SupplyCurrentLimitConfiguration(true, 15, 15, 2);
@@ -129,10 +136,8 @@ public class Shooter extends SubsystemBase {
       target = shooterLerp.interpolate(ty);
     } else if (mode == Mode.kFixedLow) {
       target = 3.5;
-    } else if (mode == Mode.kFixedHigh) {
-      target = SmartDashboard.getNumber("SetVoltage", 7);
     } else {
-      tyFilter.reset();
+      target = SmartDashboard.getNumber("SetVoltage", 5.75);
     }
   }
 

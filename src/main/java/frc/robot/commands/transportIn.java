@@ -28,7 +28,7 @@ public class TransportIn extends CommandBase {
   public void execute() {
     RobotContainer.transport.transportIn();
     RobotContainer.transport.feederHold();
-    if (Timer.getFPGATimestamp() - start > .5 && RobotContainer.transport.feeder.getSupplyCurrent() > 5.5) {
+    if (Timer.getFPGATimestamp() - start > .5 && RobotContainer.transport.feeder.getSupplyCurrent() > 4.5) {
       RobotContainer.transport.detectBall();
     }
   }

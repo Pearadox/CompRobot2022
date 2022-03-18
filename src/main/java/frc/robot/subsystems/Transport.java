@@ -63,12 +63,14 @@ public class Transport extends SubsystemBase {
 
   public void transportStop() {
     setSpeed(0);
+    topTransportMotor.set(0);
+    feeder.set(ControlMode.PercentOutput, 0);
   }
 
   public void feederShoot(){
-    topTransportMotor.set(-0.9);
+    topTransportMotor.set(-0.4);
     botTransportMotor.set(-0.9);
-    feeder.set(ControlMode.PercentOutput, 0.65);
+    feeder.set(ControlMode.PercentOutput, 0.35);
   }
 
   public void clearBall() {
@@ -81,7 +83,7 @@ public class Transport extends SubsystemBase {
 
   public void feederHold() {
     if (!hasBall) {
-      feeder.set(ControlMode.PercentOutput, -0.6);
+      feeder.set(ControlMode.PercentOutput, -0.7);
     } else {
       feeder.set(ControlMode.PercentOutput, 0);
     }

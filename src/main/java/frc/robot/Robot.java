@@ -4,11 +4,13 @@
 
 package frc.robot;
 
+import java.io.IOException;
+
 import com.revrobotics.REVPhysicsSim;
 
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.util.net.PortForwarder;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -70,6 +72,9 @@ public class Robot extends TimedRobot {
     llSwitch.setDefaultOption("On", true);
     SendableRegistry.setName(llSwitch, "Limelight Switch");
     SmartDashboard.putData(llSwitch);
+    PortForwarder.add(8888, "limelight.local", 5800);
+    PortForwarder.add(8889, "limelight.local", 5801);
+
   }
 
   /**
@@ -95,6 +100,8 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     setState(RobotState.DISABLED);
+    RobotContainer.drivetrain.setMode(false);
+    RobotContainer.shooter.setLeds(3);
   }
 
   @Override
@@ -103,12 +110,18 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    try {
+      m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
+    RobotContainer.drivetrain.setMode(true);
   }
 
   /** This function is called periodically during autonomous. */
@@ -124,6 +137,8 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    RobotContainer.drivetrain.setMode(true);
+    RobotContainer.shooter.setLeds(1);
   }
 
   /** This function is called periodically during operator control. */

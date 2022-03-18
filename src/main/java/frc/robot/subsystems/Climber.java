@@ -8,26 +8,39 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ClimberConstants;
+import frc.robot.commands.ClimberZero;
+import frc.robot.commands.CompressClimberSol;
+import frc.robot.commands.ExtendClimberSol;
+import frc.robot.commands.SetClimb;
+import frc.robot.commands.SetExtend;
+import frc.robot.commands.SetMidRung;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 
 public class Climber extends SubsystemBase {
   private static Climber INSTANCE;
 
-  private final TalonFX leftLiftMotor;
-  private final TalonFX rightLiftMotor;
+  public final TalonFX leftLiftMotor;
+  public final TalonFX rightLiftMotor;
   private DoubleSolenoid leftSolenoid;
   private DoubleSolenoid rightSolenoid;
+
+  private int count = 0;
 
   /** Creates a new Climber. */
   public Climber() {
@@ -37,6 +50,9 @@ public class Climber extends SubsystemBase {
     
     leftLiftMotor.configFactoryDefault();
     rightLiftMotor.configFactoryDefault();
+
+    leftLiftMotor.setNeutralMode(NeutralMode.Brake);
+    rightLiftMotor.setNeutralMode(NeutralMode.Brake);
 
     leftLiftMotor.setNeutralMode(NeutralMode.Brake);
     leftLiftMotor.setSensorPhase(Constants.ClimberConstants.kLeftSensorPhase);
@@ -59,12 +75,20 @@ public class Climber extends SubsystemBase {
     rightLiftMotor.config_kP(Constants.ClimberConstants.kPIDLoopIdx,  Constants.ClimberConstants.kP, Constants.kTimeoutMs);
     rightLiftMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
   
+    leftLiftMotor.configSupplyCurrentLimit(
+      new SupplyCurrentLimitConfiguration(true, 120, 150, 0.1)
+    );
+    rightLiftMotor.configSupplyCurrentLimit(
+      new SupplyCurrentLimitConfiguration(true, 120, 150, 0.1)
+    );
 
 
     if(!SmartDashboard.containsKey("Left Lift Encoder")) SmartDashboard.putNumber("Left Lift Encoder", getLeftLiftEncoder()); //77.58
     if(!SmartDashboard.containsKey("Right Lift Encoder")) SmartDashboard.putNumber("Right Lift Encoder", getRightLiftEncoder()); //-80.84
     if(!SmartDashboard.containsKey("Left Position")) SmartDashboard.putNumber("Left Position", leftLiftMotor.getSelectedSensorPosition()); //77.58
     if(!SmartDashboard.containsKey("Right Position")) SmartDashboard.putNumber("Right Position", rightLiftMotor.getSelectedSensorPosition()); //-80.84
+
+    SmartDashboard.putData("Climber", this);
 
     leftSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, ClimberConstants.LEFT_FOR_SOLENOID, ClimberConstants.LEFT_REV_SOLENOID);
     rightSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, ClimberConstants.RIGHT_FOR_SOLENOID, ClimberConstants.RIGHT_REV_SOLENOID);
@@ -84,11 +108,11 @@ public class Climber extends SubsystemBase {
   }
 
   public void climbUp() {
-    setClimbMotor(0.5);
+    setClimbMotor(-1);
   }
 
   public void climbDown() {
-    setClimbMotor(-0.5);
+    setClimbMotor(1);
   }
 
   public void stopClimb() {
@@ -127,10 +151,10 @@ public class Climber extends SubsystemBase {
   }
   
   public void setLeftPosition(double pos) {
-    leftLiftMotor.set(TalonFXControlMode.Position, pos);
+    leftLiftMotor.set(TalonFXControlMode.Position, pos, DemandType.ArbitraryFeedForward, 0.05);
   }
   public void setRightPosition(double pos) {
-    rightLiftMotor.set(TalonFXControlMode.Position, pos);
+    rightLiftMotor.set(TalonFXControlMode.Position, pos, DemandType.ArbitraryFeedForward, -0.05);
   }
   
   public double getLeftError() {
@@ -147,6 +171,12 @@ public class Climber extends SubsystemBase {
     SmartDashboard.putNumber("Right Lift Encoder", getRightLiftEncoder());
     SmartDashboard.putNumber("Left Position", leftLiftMotor.getSelectedSensorPosition());
     SmartDashboard.putNumber("Right Position", rightLiftMotor.getSelectedSensorPosition());
+    SmartDashboard.putNumber("Left Current", leftLiftMotor.getSupplyCurrent());
+    SmartDashboard.putNumber("Right Current", rightLiftMotor.getSupplyCurrent());
+    SmartDashboard.putData("Climber", this);
+    SmartDashboard.putNumber("Climber Sequence", count);
+    SmartDashboard.putNumber("Left Error", getLeftError());
+    SmartDashboard.putNumber("Right Error", getRightError());
   }
 
   public static Climber getInstance() {
@@ -154,5 +184,54 @@ public class Climber extends SubsystemBase {
       INSTANCE = new Climber();
     }
     return INSTANCE;
+  }
+
+  public void incrementSequence() {
+    switch (count) {
+      case 0: 
+        CommandScheduler.getInstance().schedule(new ClimberZero());
+        break;
+      case 1:
+        CommandScheduler.getInstance().schedule(new SetExtend());
+        break;
+      case 2:
+        CommandScheduler.getInstance().schedule(new SetClimb());
+        break;
+      case 3:
+        CommandScheduler.getInstance().schedule(new RunCommand(() -> this.setClimbMotor(- 0.2)).withTimeout(0.5).andThen(new SetMidRung()));
+        break;
+      case 4:
+        CommandScheduler.getInstance().schedule(new CompressClimberSol());
+        break;
+      case 5:
+        CommandScheduler.getInstance().schedule(new SetExtend());
+        break;
+      case 6:
+        CommandScheduler.getInstance().schedule(new ExtendClimberSol());
+        break;
+      case 7:
+        CommandScheduler.getInstance().schedule(new SetClimb());
+        break;
+      case 8:
+        CommandScheduler.getInstance().schedule(new RunCommand(() -> this.setClimbMotor(-0.2)).withTimeout(0.5).andThen(new SetMidRung()));
+        break;
+      case 9:
+        CommandScheduler.getInstance().schedule(new CompressClimberSol());
+        break;
+      case 10:
+        CommandScheduler.getInstance().schedule(new SetExtend());
+        break;
+      case 11:
+        CommandScheduler.getInstance().schedule(new ExtendClimberSol());
+        break;
+      case 12:
+        CommandScheduler.getInstance().schedule(new SetClimb().withTimeout(0.6));
+        break;
+    }
+    count++;
+  }
+
+  public void resetSequence() {
+    count = 0;
   }
 }

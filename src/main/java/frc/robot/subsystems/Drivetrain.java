@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -24,7 +25,7 @@ public class Drivetrain extends SubsystemBase {
   /** Creates a new Drivetrain. */
   private static Drivetrain INSTANCE;
 
-  
+  private Pose2d pose;
 
   public final CANSparkMax leftMotor1 =
       new PearadoxNeo(DrivetrainConstants.FRONT_LEFT_MOTOR, IdleMode.kBrake);
@@ -39,6 +40,25 @@ public class Drivetrain extends SubsystemBase {
   private final RelativeEncoder leftEncoder2 = leftMotor2.getEncoder();
   private final RelativeEncoder rightEncoder1 = rightMotor1.getEncoder();
   private final RelativeEncoder rightEncoder2 = rightMotor2.getEncoder();
+  public double Vision_kp = 0.0;
+  public double Vision_ki = 0.0;
+  public double Vision_kd = 0.0;
+  public double Vision_dz = 0.3;
+
+  public void setMode(boolean mode){
+    if(mode){
+      leftMotor1.setIdleMode(IdleMode.kBrake);
+      leftMotor2.setIdleMode(IdleMode.kCoast);
+      rightMotor1.setIdleMode(IdleMode.kBrake);
+      rightMotor2.setIdleMode(IdleMode.kCoast);
+    }
+    else{
+      leftMotor1.setIdleMode(IdleMode.kCoast);
+      leftMotor2.setIdleMode(IdleMode.kCoast);
+      rightMotor1.setIdleMode(IdleMode.kCoast);
+      rightMotor2.setIdleMode(IdleMode.kCoast);
+    }
+  }
 
   private Drivetrain() {
 
@@ -51,6 +71,10 @@ public class Drivetrain extends SubsystemBase {
 
     if (!SmartDashboard.containsKey("LeftMotor")) SmartDashboard.putNumber("LeftMotor", 0);
     if (!SmartDashboard.containsKey("RightMotor")) SmartDashboard.putNumber("RightMotor", 0);
+    if(!SmartDashboard.containsKey("VisionHold_Kp")) SmartDashboard.putNumber("VisionHold_Kp", 0.02); 
+    if(!SmartDashboard.containsKey("VisionHold_Ki")) SmartDashboard.putNumber("VisionHold_Ki", 0.00); 
+    if(!SmartDashboard.containsKey("VisionHold_Kd")) SmartDashboard.putNumber("VisionHold_Kd", 0.00);
+    if(!SmartDashboard.containsKey("VisionHold_dz")) SmartDashboard.putNumber("VisionHold_dz", 0.3);  
   }
 
   public void setVoltages(double left, double right) {
@@ -64,7 +88,7 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public double getLeftEncoderRevs() {
-    return (leftEncoder1.getPosition() + leftEncoder2.getPosition());
+    return (leftEncoder1.getPosition() + leftEncoder2.getPosition()) / 2;
   }
 
   public double getLeftEncoderDistance() {
@@ -72,21 +96,30 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public double getRightEncoderRevs() {
-    return (rightEncoder1.getPosition() + rightEncoder2.getPosition());
+    return (rightEncoder1.getPosition() + rightEncoder2.getPosition()) / 2;
   }
+
+  public double getRightEncoderVelocity() {
+    return ((rightEncoder1.getVelocity() + rightEncoder2.getVelocity()) / 2) * WHEEL_CIRCUMFRENCE  / (GEAR_RATIO *60);
+  }
+
+  public double getLeftEncoderVelocity() {
+    return ((leftEncoder1.getVelocity() + leftEncoder2.getVelocity()) / 2) * WHEEL_CIRCUMFRENCE  / (GEAR_RATIO *60);
+  }
+
 
   public double getRightEncoderDistance() {
     return getRightEncoderRevs() * WHEEL_CIRCUMFRENCE / GEAR_RATIO;
   }
 
   public DifferentialDriveWheelSpeeds getWheelSpeeds() {
-    return new DifferentialDriveWheelSpeeds();
+    return new DifferentialDriveWheelSpeeds(getLeftEncoderVelocity(), getRightEncoderVelocity());
   }
 
-  private final ADXRS450_Gyro m_gyro = new ADXRS450_Gyro();
+  private final ADIS16470_IMU gyro = new ADIS16470_IMU();
 
   public double getHeading() {
-    return m_gyro.getRotation2d().getDegrees();
+    return gyro.getAngle();
   }
 
   public void arcadeDrive(double throttle, double twist) {
@@ -102,17 +135,17 @@ public class Drivetrain extends SubsystemBase {
     setVoltages(12 * (throttle + twist), 12 * (throttle - twist));
   }
 
-  private final DifferentialDriveOdometry m_odometry =
+  private final DifferentialDriveOdometry odometry =
       new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()));
 
   public void zeroHeading() {
-    m_gyro.reset();
+    gyro.reset();
   }
 
   public void resetOdometry(Pose2d pose) {
     encoderReset();
     zeroHeading();
-    m_odometry.resetPosition(pose, Rotation2d.fromDegrees(-getHeading()));
+      odometry.resetPosition(pose, Rotation2d.fromDegrees(-getHeading()));
   }
 
   public void encoderReset() {
@@ -125,7 +158,16 @@ public class Drivetrain extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    m_odometry.update(m_gyro.getRotation2d(), getLeftEncoderDistance(), getRightEncoderDistance());
+    pose = odometry.update(Rotation2d.fromDegrees(gyro.getAngle()), getLeftEncoderDistance(), getRightEncoderDistance());
+    SmartDashboard.putNumber("Distance", (getLeftEncoderDistance() + getRightEncoderDistance())/2);
+    Vision_kp = SmartDashboard.getNumber("VisionHold_Kp", 0.02);
+    Vision_kp = SmartDashboard.getNumber("VisionHold_Ki", 0.0);
+    Vision_kp = SmartDashboard.getNumber("VisionHold_Kd", 0.0);
+    Vision_dz = SmartDashboard.getNumber("VisionHold_dz", 0.0);
+  }
+
+  public Pose2d getPose(){
+    return pose;
   }
 
   public void dashboard() {

@@ -4,12 +4,15 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 
 public class SetMidRung extends CommandBase {
   /** Creates a new SetMidRung. */
+
+  private double initialTime;
   public SetMidRung() {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(RobotContainer.climber);
@@ -18,8 +21,9 @@ public class SetMidRung extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    RobotContainer.climber.setLeftPosition(Constants.ClimberConstants.LEFT_MID);
-    RobotContainer.climber.setRightPosition(Constants.ClimberConstants.RIGHT_MID);
+    initialTime = Timer.getFPGATimestamp();
+    RobotContainer.climber.setLeftPosition(-Constants.ClimberConstants.MID);
+    RobotContainer.climber.setRightPosition(Constants.ClimberConstants.MID);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

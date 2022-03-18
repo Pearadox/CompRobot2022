@@ -21,17 +21,17 @@ public final class Constants {
   public static final int TIMEOUT = 30;
 
   public static final class DrivetrainConstants {
-    public static final double kS = 0.16734; // Volts
-    public static final double kV = 2.6713; // Volt Seconds per Meter
-    public static final double kA = 0.27882; // Volt Seconds Squared per Meter
+    public static final double kS = 0.18579; // Volts
+    public static final double kV = 3.2961; // Volt Seconds per Meter
+    public static final double kA = 0.42341; // Volt Seconds Squared per Meter
 
     public static final double kPVel = 6.9201; // Volt Seconds per Meter
 
-    public static final double TRACK_WIDTH = 0.5461; // Meters
+    public static final double TRACK_WIDTH = Units.inchesToMeters(22.5); // Meters
     public static final DifferentialDriveKinematics KINEMATICS =
         new DifferentialDriveKinematics(TRACK_WIDTH);
 
-    public static final double WHEEL_DIAMETER = Units.inchesToMeters(6.0); //Meters
+    public static final double WHEEL_DIAMETER = Units.inchesToMeters(4.0 * 0.95); //Meters
 
     public static final double DISTANCE_PER_REVOLUTION = WHEEL_DIAMETER * Math.PI;
     public static final double PULSES_PER_REVOLUTION = 42 * 5.6;
@@ -45,7 +45,7 @@ public final class Constants {
     public static final double kRamseteB = 2;
     public static final double kRamseteZeta = 0.7;
 
-    public static final double GEAR_RATIO = 364d / 36d;
+    public static final double GEAR_RATIO = 1800d / 216d;
 
     public static final double WHEEL_CIRCUMFRENCE = 2 * Math.PI * (WHEEL_DIAMETER/2);
 
@@ -79,7 +79,9 @@ public final class Constants {
     public static boolean kRightMotorInvert = false;
     public static final int kPIDLoopIdx = 0;
     public static final int kSlotIdx = 0;
-    public static final double kP = 0.15;
+    public static final double kP = 21d / 2048;
+    public static final double EXTEND = -50 * 2048;
+    public static final double MID = -20 * 2048;
   }
 
   public static final class TransportConstants {
@@ -100,5 +102,5 @@ public final class Constants {
     public static final double MAXPERCENT = 0.4;
   }
 
-  public static int kTimeoutMs;
+  public static int kTimeoutMs = 200;
 }
