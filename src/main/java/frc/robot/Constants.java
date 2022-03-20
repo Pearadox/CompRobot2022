@@ -79,9 +79,9 @@ public final class Constants {
     public static boolean kRightMotorInvert = false;
     public static final int kPIDLoopIdx = 0;
     public static final int kSlotIdx = 0;
-    public static final double kP = 21d / 2048;
-    public static final double EXTEND = -50 * 2048;
-    public static final double MID = -20 * 2048;
+    public static final double kP = 30d / 2048;
+    public static final double EXTEND = -50 * 2048 * 15 / 9d;
+    public static final double MID = -20 * 2048 * 15 / 9d;
   }
 
   public static final class TransportConstants {
