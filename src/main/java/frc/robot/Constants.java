@@ -100,6 +100,11 @@ public final class Constants {
     public static final int LEFT_SHOOTER = 31;
     public static final int RIGHT_SHOOTER = 30;
     public static final double MAXPERCENT = 0.4;
+
+    public static final double 
+    kS = 0.84535; //0.84535
+    public static final double kV = 0.11811; //0.11811
+    public static final double kP = 0.0307; //0.04257
   }
 
   public static int kTimeoutMs = 200;

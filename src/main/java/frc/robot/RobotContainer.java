@@ -7,6 +7,8 @@ package frc.robot;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -105,8 +107,10 @@ public class RobotContainer {
   JoystickButton opbtn12 = new JoystickButton(operatorJoystick, 12);
 
   private void configureButtonBindings() {
-    btn1.whileHeld(new RunCommand(transport::feederShoot, transport)).whenReleased(
-      new InstantCommand(transport::transportStop, transport).andThen(transport::clearBall, transport)
+    btn1.whileHeld(new RunCommand(() -> transport.setSpeed(-0.5), transport).withTimeout(0.2).andThen(
+      new RunCommand(transport::feederShoot, transport)))
+        .whenReleased(
+          new InstantCommand(transport::transportStop, transport).andThen(transport::clearBall, transport)
     );
     btn2.whileHeld(new AutoAim());
     btn3.toggleWhenPressed(
@@ -120,7 +124,7 @@ public class RobotContainer {
     btn6.whileHeld(new SetExtend());
     btn7.whenPressed(new ToggleIntake().withTimeout(0.4));
     btn8.whileHeld(new Outtake());
-    btn9.whenPressed(new ExtendClimberSol());
+    btn9.whenPressed(new ExpandClimberSol());
     btn10.whenPressed(new CompressClimberSol());
     btn11.whenPressed(new InstantCommand(() -> shooter.setMode(Mode.kFixedLow)));
     btn12.whenPressed(new InstantCommand(() -> shooter.setMode(Mode.kAuto))); 
@@ -157,7 +161,7 @@ public class RobotContainer {
     }, climber));
     opbtn8.whileHeld(new ClimbUp());
     opbtn7.whileHeld(new ClimbDown());
-    opbtn9.whenPressed(new ExtendClimberSol());
+    opbtn9.whenPressed(new ExpandClimberSol());
     opbtn10.whenPressed(new CompressClimberSol());
     opbtn11.whenPressed(climber::resetSequence);
     opbtn12.whenPressed(new InstantCommand(() -> shooter.setMode(Mode.kFixedHigh)));
@@ -219,17 +223,41 @@ public class RobotContainer {
     Path path = Filesystem.getDeployDirectory().toPath().resolve("output/" + "RightBack" + ".wpilib.json");
     Trajectory trajectory = TrajectoryUtil.fromPathweaverJson(path);
     drivetrain.resetOdometry(trajectory.getInitialPose());
-    return new ToggleIntake().withTimeout(0.4)
+    var stuff = new RunCommand(() -> shooter.setVoltage(5.25), shooter).alongWith(
+      new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8))
+        .andThen(new ToggleIntake().withTimeout(0.4))
         .andThen(new InstantCommand(() -> shooter.setMode(Mode.kAuto)))
         .andThen(new InstantCommand(() -> RobotContainer.intake.setIntakeIn(0.5)))
         .andThen(makeRamseteCommand("RightBack"))
         .andThen(new AutoAim().withTimeout(1))
-        .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(3))
+        .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(2))
+        .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8)))
         .andThen(makeRamseteCommand("Right1"))
         .andThen(makeRamseteCommand("Right2"))
         .andThen(new ToggleIntake().withTimeout(0.4))
         .andThen(new AutoAim().withTimeout(1))
-        .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(3));
+        .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(2))
+        .andThen(new TurnToAngle(drivetrain.getHeading() + 80).withTimeout(2))
+        .andThen(new RunCommand(() -> drivetrain.setVoltages(-8, -8), drivetrain).withTimeout(0.75))
+        .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain)));
+
+    return stuff;
+    // new RunCommand(() -> shooter.setVoltage(5.25), shooter).alongWith(
+    //   new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8))
+    //     .andThen(new ToggleIntake().withTimeout(0.4))
+    //     .andThen(new InstantCommand(() -> shooter.setMode(Mode.kAuto)))
+    //     .andThen(new InstantCommand(() -> RobotContainer.intake.setIntakeIn(0.5)))
+    //     .andThen(makeRamseteCommand("RightBack"))
+    //     .andThen(new AutoAim().withTimeout(1))
+    //     .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(3))
+    //     .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8)))
+    //     .andThen(makeRamseteCommand("Right1"))
+    //     .andThen(makeRamseteCommand("Right2"))
+    //     .andThen(new ToggleIntake().withTimeout(0.4))
+    //     .andThen(new AutoAim().withTimeout(1))
+    //     .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(3)));
+
+    
   }
   private void portForwarding() {
     EForwardableConnections.addPortForwarding(EForwardableConnections.LIMELIGHT_CAMERA_FEED);

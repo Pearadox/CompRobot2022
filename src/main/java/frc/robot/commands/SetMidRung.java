@@ -28,7 +28,10 @@ public class SetMidRung extends CommandBase {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    RobotContainer.climber.setLeftPosition(-Constants.ClimberConstants.MID);
+    RobotContainer.climber.setRightPosition(Constants.ClimberConstants.MID);
+  }
 
   // Called once the command ends or is interrupted.
   @Override
@@ -40,6 +43,7 @@ public class SetMidRung extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return ((Math.abs(RobotContainer.climber.getLeftError()) < 100) && (Math.abs(RobotContainer.climber.getRightError()) < 100));
+    return false;
+    // ((Math.abs(RobotContainer.climber.getLeftError()) < 100) && (Math.abs(RobotContainer.climber.getRightError()) < 100));
   }
 }

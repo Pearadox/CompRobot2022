@@ -17,7 +17,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.commands.ClimberZero;
 import frc.robot.commands.CompressClimberSol;
-import frc.robot.commands.ExtendClimberSol;
+import frc.robot.commands.ExpandClimberSol;
 import frc.robot.commands.SetClimb;
 import frc.robot.commands.SetExtend;
 import frc.robot.commands.SetMidRung;
@@ -177,6 +177,7 @@ public class Climber extends SubsystemBase {
     SmartDashboard.putNumber("Climber Sequence", count);
     SmartDashboard.putNumber("Left Error", getLeftError());
     SmartDashboard.putNumber("Right Error", getRightError());
+    SmartDashboard.putNumber("Left Lift Target", leftLiftMotor.getClosedLoopTarget());
   }
 
   public static Climber getInstance() {
@@ -207,7 +208,7 @@ public class Climber extends SubsystemBase {
         CommandScheduler.getInstance().schedule(new SetExtend());
         break;
       case 6:
-        CommandScheduler.getInstance().schedule(new ExtendClimberSol());
+        CommandScheduler.getInstance().schedule(new ExpandClimberSol());
         break;
       case 7:
         CommandScheduler.getInstance().schedule(new SetClimb());
@@ -222,7 +223,7 @@ public class Climber extends SubsystemBase {
         CommandScheduler.getInstance().schedule(new SetExtend());
         break;
       case 11:
-        CommandScheduler.getInstance().schedule(new ExtendClimberSol());
+        CommandScheduler.getInstance().schedule(new ExpandClimberSol());
         break;
       case 12:
         CommandScheduler.getInstance().schedule(new SetClimb().withTimeout(0.6));

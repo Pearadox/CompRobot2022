@@ -25,6 +25,8 @@ public class SetExtend extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    RobotContainer.climber.setLeftPosition(-Constants.ClimberConstants.EXTEND);
+    RobotContainer.climber.setRightPosition(Constants.ClimberConstants.EXTEND);
   }
 
   // Called once the command ends or is interrupted.
@@ -37,6 +39,7 @@ public class SetExtend extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {    
-    return ((Math.abs(RobotContainer.climber.getLeftError()) < 100) && (Math.abs(RobotContainer.climber.getRightError()) < 100));
+    return false;
+    // ((Math.abs(RobotContainer.climber.getLeftError()) < 100) && (Math.abs(RobotContainer.climber.getRightError()) < 100));
   }
 }

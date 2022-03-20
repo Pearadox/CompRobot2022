@@ -14,6 +14,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.TransportConstants;
 
@@ -44,7 +45,7 @@ public class Transport extends SubsystemBase {
   }
 
   public void setSpeed(double speed) {
-    // topTransportMotor.set(-speed/4);
+    topTransportMotor.set(-speed/4);
     botTransportMotor.set(-speed);
   }
 
@@ -68,9 +69,9 @@ public class Transport extends SubsystemBase {
   }
 
   public void feederShoot(){
-    topTransportMotor.set(-0.4);
+    topTransportMotor.set(-0.3);
     botTransportMotor.set(-0.9);
-    feeder.set(ControlMode.PercentOutput, 0.35);
+    feeder.set(ControlMode.PercentOutput, 0.8);
   }
 
   public void clearBall() {
@@ -83,7 +84,7 @@ public class Transport extends SubsystemBase {
 
   public void feederHold() {
     if (!hasBall) {
-      feeder.set(ControlMode.PercentOutput, -0.7);
+      feeder.set(ControlMode.PercentOutput, -0.8);
     } else {
       feeder.set(ControlMode.PercentOutput, 0);
     }

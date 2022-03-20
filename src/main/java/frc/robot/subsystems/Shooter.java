@@ -53,7 +53,8 @@ public class Shooter extends SubsystemBase {
     leftShooter.setInverted(InvertType.InvertMotorOutput);
     rightShooter.setInverted(InvertType.None);
     if(!SmartDashboard.containsKey("MaxPercentage")) SmartDashboard.putNumber("MaxPercentage", ShooterConstants.MAXPERCENT);
-    if(!SmartDashboard.containsKey("SetVoltage")) SmartDashboard.putNumber("SetVoltage", 0);
+    if(!SmartDashboard.containsKey("SetVoltage")) SmartDashboard.putNumber("SetVoltage", 5.75);
+    if(!SmartDashboard.containsKey("Lerp Table")) SmartDashboard.putNumber("Lerp Target", target);
     limitCurrent = new SupplyCurrentLimitConfiguration(true, 60, 60, 1);
     leftShooter.configSupplyCurrentLimit(limitCurrent);
     rightShooter.configSupplyCurrentLimit(limitCurrent);
@@ -61,13 +62,13 @@ public class Shooter extends SubsystemBase {
     rightShooter.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 20, Constants.TIMEOUT);
 
     // LOOKUP TABLE (LIMELIGHT TY, VOLTAGE)
-    shooterLerp.addPoint(10, 3.225);
-    shooterLerp.addPoint(6, 3.225);    
-    shooterLerp.addPoint(1, 3.6);
-    shooterLerp.addPoint(0, 5.0);
-    shooterLerp.addPoint(-2, 5.1);
-    shooterLerp.addPoint(-10, 5.75);
-    shooterLerp.addPoint(-16, 6.1);
+    shooterLerp.addPoint(10, (3.225 - ShooterConstants.kS)/ ShooterConstants.kV);
+    shooterLerp.addPoint(6, (3.525 - ShooterConstants.kS) / ShooterConstants.kV);    
+    // shooterLerp.addPoint(1, 3.6);
+    shooterLerp.addPoint(0, (5.0 - ShooterConstants.kS) / ShooterConstants.kV);
+    shooterLerp.addPoint(-2, (5.2 - ShooterConstants.kS) / ShooterConstants.kV);
+    shooterLerp.addPoint(-10, (5.75 - ShooterConstants.kS) / ShooterConstants.kV);
+    shooterLerp.addPoint(-16, (6.4 - ShooterConstants.kS) / ShooterConstants.kV);
   }
 
   public void setMode(Mode mode) {
@@ -92,12 +93,17 @@ public class Shooter extends SubsystemBase {
 
   public void setVoltage(double voltage) {
     var limitedVoltage = shooterLimiter.calculate(voltage);
-    leftShooter.set(ControlMode.PercentOutput, voltage/leftShooter.getBusVoltage());
-    rightShooter.set(ControlMode.PercentOutput, voltage/rightShooter.getBusVoltage());
+    leftShooter.set(ControlMode.PercentOutput, limitedVoltage/leftShooter.getBusVoltage());
+    rightShooter.set(ControlMode.PercentOutput, limitedVoltage/rightShooter.getBusVoltage());
+    System.out.println("bozo: " + limitedVoltage + " " + voltage);
+  }
+
+  public void setSetpoint(double rps) {
+    setVoltage(ShooterConstants.kS + ShooterConstants.kV * rps + ShooterConstants.kP * (rps - getSpeed()));
   }
 
   public void autoSpeed() {
-    setVoltage(target);
+    setSetpoint(target);
   }
 
   //Negative is Out, Positive is In
@@ -114,6 +120,10 @@ public class Shooter extends SubsystemBase {
     llTable.getEntry("ledMode").setNumber(state);
   }
 
+  public double getSpeed() {
+    return (leftShooter.getSelectedSensorVelocity() + rightShooter.getSelectedSensorVelocity()) / 409.6;
+  }
+
 
   public void dashboard() {
   }
@@ -126,7 +136,8 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putNumber("Shooter Temp", leftShooter.getTemperature());
     SmartDashboard.putNumber("Shooter Bus Voltage", leftShooter.getBusVoltage());
     SmartDashboard.putString("Shooter Mode", mode.toString());
-    SmartDashboard.putNumber("Shooter RPM", leftShooter.getSelectedSensorVelocity() / 204.8);
+    SmartDashboard.putNumber("Shooter RPM", getSpeed()
+    );
     SmartDashboard.putNumber("Target", target);
 
     // if(leftShooter.getTemperature() > 50) {
@@ -139,10 +150,11 @@ public class Shooter extends SubsystemBase {
       double ty = tyFilter.calculate(llTable.getEntry("ty").getDouble(0));
       target = shooterLerp.interpolate(ty);
     } else if (mode == Mode.kFixedLow) {
-      target = 3.5;
+      target = 3.5 / ShooterConstants.kV;
     } else {
-      target = SmartDashboard.getNumber("SetVoltage", 5.75);
+      target = SmartDashboard.getNumber("SetVoltage", 5.75) / ShooterConstants.kV;
     }
+    SmartDashboard.putNumber("Lerp Target", target);
   }
 
   public static Shooter getInstance() {

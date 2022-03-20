@@ -29,6 +29,7 @@ public class AutoAim extends CommandBase {
   @Override
   public void initialize() {
     llTable.getEntry("ledMode").setNumber(3);
+    RobotContainer.drivetrain.setAutoAim();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -69,7 +70,7 @@ public class AutoAim extends CommandBase {
   public void end(boolean interrupted) {
     
     llTable.getEntry("ledMode").setNumber(1);
-
+    RobotContainer.drivetrain.setMode(true);
   }
 
   // Returns true when the command should end.

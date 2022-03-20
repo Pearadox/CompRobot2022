@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 
 public class TransportIn extends CommandBase {
-  /** Creates a new intakeIn. */
+  /** Creates a new TransportIn. */
   double start;
 
   public TransportIn() {

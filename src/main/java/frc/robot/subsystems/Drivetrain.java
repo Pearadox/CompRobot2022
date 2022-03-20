@@ -87,6 +87,13 @@ public class Drivetrain extends SubsystemBase {
     rightMotor1.set(right);
   }
 
+  public void setAutoAim() {
+    leftMotor1.setIdleMode(IdleMode.kBrake);
+    leftMotor2.setIdleMode(IdleMode.kBrake);
+    rightMotor1.setIdleMode(IdleMode.kBrake);
+    rightMotor2.setIdleMode(IdleMode.kBrake);
+  }
+
   public double getLeftEncoderRevs() {
     return (leftEncoder1.getPosition() + leftEncoder2.getPosition()) / 2;
   }
