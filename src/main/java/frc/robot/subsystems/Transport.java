@@ -45,13 +45,13 @@ public class Transport extends SubsystemBase {
   }
 
   public void setSpeed(double speed) {
-    topTransportMotor.set(-speed/4);
+    topTransportMotor.set(-speed/2);
     botTransportMotor.set(-speed);
   }
 
   public void transportIn() {
     if (!hasBall) {
-      topTransportMotor.set(-0.15);
+      topTransportMotor.set(-0.3);
     } else {
       topTransportMotor.set(0);
     }
@@ -69,7 +69,7 @@ public class Transport extends SubsystemBase {
   }
 
   public void feederShoot(){
-    topTransportMotor.set(-0.3);
+    topTransportMotor.set(-0.7);
     botTransportMotor.set(-0.9);
     feeder.set(ControlMode.PercentOutput, 0.8);
   }

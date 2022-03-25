@@ -63,6 +63,9 @@ public class RobotContainer {
     shooter.setDefaultCommand(new ShooterRampUpVoltage());
     intake.setDefaultCommand(new IntakeIn());
     SmartDashboard.putData("Auton Chooser", auton);
+    if(SmartDashboard.getNumber("Climber Sequence", 0) == 0) {
+      climber.setDefaultCommand(new DefaultClimberDown());
+    }
 
     auton.addOption("TwoMeters", "TwoMeters");
     auton.addOption("RightBack", "RightBack");

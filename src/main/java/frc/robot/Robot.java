@@ -138,7 +138,7 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
     RobotContainer.drivetrain.setMode(true);
-    RobotContainer.shooter.setLeds(1);
+    RobotContainer.shooter.setLeds(3);
   }
 
   /** This function is called periodically during operator control. */

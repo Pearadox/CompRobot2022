@@ -147,6 +147,8 @@ public class Climber extends SubsystemBase {
     rightLiftMotor.setSelectedSensorPosition(0);
   }
 
+  
+
   public void dashboard() {
   }
   
@@ -177,7 +179,6 @@ public class Climber extends SubsystemBase {
     SmartDashboard.putNumber("Climber Sequence", count);
     SmartDashboard.putNumber("Left Error", getLeftError());
     SmartDashboard.putNumber("Right Error", getRightError());
-    SmartDashboard.putNumber("Left Lift Target", leftLiftMotor.getClosedLoopTarget());
   }
 
   public static Climber getInstance() {

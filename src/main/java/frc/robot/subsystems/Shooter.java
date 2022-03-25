@@ -41,6 +41,8 @@ public class Shooter extends SubsystemBase {
   private SlewRateLimiter shooterLimiter = new SlewRateLimiter(10);
   private double target = 0;
   private Mode mode = Mode.kAuto;
+  private double adjust = 0;
+  private double increment = 0.01;
   
   public enum Mode {
     kAuto, kFixedHigh, kFixedLow;
@@ -55,6 +57,7 @@ public class Shooter extends SubsystemBase {
     if(!SmartDashboard.containsKey("MaxPercentage")) SmartDashboard.putNumber("MaxPercentage", ShooterConstants.MAXPERCENT);
     if(!SmartDashboard.containsKey("SetVoltage")) SmartDashboard.putNumber("SetVoltage", 5.75);
     if(!SmartDashboard.containsKey("Lerp Table")) SmartDashboard.putNumber("Lerp Target", target);
+    if(!SmartDashboard.containsKey("Shooter Adjust")) SmartDashboard.putNumber("Shooter Adjust", adjust);
     limitCurrent = new SupplyCurrentLimitConfiguration(true, 60, 60, 1);
     leftShooter.configSupplyCurrentLimit(limitCurrent);
     rightShooter.configSupplyCurrentLimit(limitCurrent);
@@ -103,7 +106,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void autoSpeed() {
-    setSetpoint(target);
+    setSetpoint(target + target * increment * SmartDashboard.getNumber("Shooter Adjust", adjust));
   }
 
   //Negative is Out, Positive is In
@@ -138,7 +141,7 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putString("Shooter Mode", mode.toString());
     SmartDashboard.putNumber("Shooter RPM", getSpeed()
     );
-    SmartDashboard.putNumber("Target", target);
+    SmartDashboard.putNumber("Target", target + target * increment * SmartDashboard.getNumber("Shooter Adjust", adjust));
 
     // if(leftShooter.getTemperature() > 50) {
     // limitCurrent = new SupplyCurrentLimitConfiguration(true, 15, 15, 2);

@@ -69,7 +69,7 @@ public class AutoAim extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     
-    llTable.getEntry("ledMode").setNumber(1);
+    // llTable.getEntry("ledMode").setNumber(1);
     RobotContainer.drivetrain.setMode(true);
   }
 
