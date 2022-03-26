@@ -20,6 +20,7 @@ import frc.robot.commands.CompressClimberSol;
 import frc.robot.commands.ExpandClimberSol;
 import frc.robot.commands.SetClimb;
 import frc.robot.commands.SetExtend;
+import frc.robot.commands.SetFirstExtend;
 import frc.robot.commands.SetMidRung;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
@@ -108,11 +109,11 @@ public class Climber extends SubsystemBase {
   }
 
   public void climbUp() {
-    setClimbMotor(-1);
+    setClimbMotor(-0.5);
   }
 
   public void climbDown() {
-    setClimbMotor(1);
+    setClimbMotor(0.7);
   }
 
   public void stopClimb() {
@@ -192,9 +193,10 @@ public class Climber extends SubsystemBase {
     switch (count) {
       case 0: 
         CommandScheduler.getInstance().schedule(new ClimberZero());
+        // count++;
         break;
       case 1:
-        CommandScheduler.getInstance().schedule(new SetExtend());
+        CommandScheduler.getInstance().schedule(new SetFirstExtend());
         break;
       case 2:
         CommandScheduler.getInstance().schedule(new SetClimb());

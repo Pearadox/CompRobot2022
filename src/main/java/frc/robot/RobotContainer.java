@@ -57,21 +57,16 @@ public class RobotContainer {
     // Configure the button bindings
     portForwarding();
     configureButtonBindings();
-    compressor.enableAnalog(60, 115);
+    compressor.enableAnalog(60, 110);
     drivetrain.setDefaultCommand(new ArcadeDrive());
     transport.setDefaultCommand(new TransportIn());
     shooter.setDefaultCommand(new ShooterRampUpVoltage());
     intake.setDefaultCommand(new IntakeIn());
     SmartDashboard.putData("Auton Chooser", auton);
-    if(SmartDashboard.getNumber("Climber Sequence", 0) == 0) {
-      climber.setDefaultCommand(new DefaultClimberDown());
-    }
-
-    auton.addOption("TwoMeters", "TwoMeters");
-    auton.addOption("RightBack", "RightBack");
-    auton.addOption("TestArc", "TestArc");
-    
-
+    climber.setDefaultCommand(new DefaultClimberDown());
+    auton.setDefaultOption("TwoBallAuton", "TwoBallAuton");
+    auton.addOption("ThreeBallAuton", "ThreeBallAuton");
+    // auton.addOption("TwoBallAuton", "TwoBallAuton");
   }
 
   /**
@@ -226,9 +221,9 @@ public class RobotContainer {
     Path path = Filesystem.getDeployDirectory().toPath().resolve("output/" + "RightBack" + ".wpilib.json");
     Trajectory trajectory = TrajectoryUtil.fromPathweaverJson(path);
     drivetrain.resetOdometry(trajectory.getInitialPose());
-    var stuff = new RunCommand(() -> shooter.setVoltage(5.25), shooter).alongWith(
+    var ThreeBallAuton = new RunCommand(() -> shooter.setVoltage(5.35), shooter).alongWith(
       new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8))
-        .andThen(new ToggleIntake().withTimeout(0.4))
+        .andThen(new ToggleIntake().withTimeout(0.5))
         .andThen(new InstantCommand(() -> shooter.setMode(Mode.kAuto)))
         .andThen(new InstantCommand(() -> RobotContainer.intake.setIntakeIn(0.5)))
         .andThen(makeRamseteCommand("RightBack"))
@@ -240,25 +235,25 @@ public class RobotContainer {
         .andThen(new ToggleIntake().withTimeout(0.4))
         .andThen(new AutoAim().withTimeout(1))
         .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(2))
+        .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
         .andThen(new TurnToAngle(drivetrain.getHeading() + 80).withTimeout(2))
         .andThen(new RunCommand(() -> drivetrain.setVoltages(-8, -8), drivetrain).withTimeout(0.75))
         .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain)));
-
-    return stuff;
-    // new RunCommand(() -> shooter.setVoltage(5.25), shooter).alongWith(
-    //   new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8))
-    //     .andThen(new ToggleIntake().withTimeout(0.4))
-    //     .andThen(new InstantCommand(() -> shooter.setMode(Mode.kAuto)))
-    //     .andThen(new InstantCommand(() -> RobotContainer.intake.setIntakeIn(0.5)))
-    //     .andThen(makeRamseteCommand("RightBack"))
-    //     .andThen(new AutoAim().withTimeout(1))
-    //     .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(3))
-    //     .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8)))
-    //     .andThen(makeRamseteCommand("Right1"))
-    //     .andThen(makeRamseteCommand("Right2"))
-    //     .andThen(new ToggleIntake().withTimeout(0.4))
-    //     .andThen(new AutoAim().withTimeout(1))
-    //     .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(3)));
+    
+    var TwoBallAuton = new RunCommand(() -> shooter.setVoltage(5.25), shooter).alongWith(
+      new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8))
+        .andThen(new ToggleIntake().withTimeout(0.4))
+        .andThen(new InstantCommand(() -> shooter.setMode(Mode.kAuto)))
+        .andThen(new InstantCommand(() -> RobotContainer.intake.setIntakeIn(0.5)))
+        .andThen(makeRamseteCommand("RightBack"))
+        .andThen(new AutoAim().withTimeout(1))
+        .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(3))
+        .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8))));
+    if(auton.getSelected().equals("TwoBallAuton")) {
+      return TwoBallAuton;
+    } else {
+      return ThreeBallAuton;
+    }
 
     
   }

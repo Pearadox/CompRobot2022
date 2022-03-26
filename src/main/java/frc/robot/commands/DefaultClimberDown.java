@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 
@@ -22,7 +23,11 @@ public class DefaultClimberDown extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    RobotContainer.climber.setClimbMotor(0.05);
+    if(SmartDashboard.getNumber("Climber Sequence", 0) == 0) {
+      RobotContainer.climber.setClimbMotor(0.1);
+    } else {
+      RobotContainer.climber.setClimbMotor(0);
+    }    
   }
 
   // Called once the command ends or is interrupted.

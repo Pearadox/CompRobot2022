@@ -67,10 +67,12 @@ public final class Constants {
     public static final int LEFT_REV_SOLENOID = 2;
     public static final int RIGHT_FOR_SOLENOID = 6;
     public static final int RIGHT_REV_SOLENOID = 7;
+    public static final int LEFT_FIRST_EXTEND = 164904; //169000
     public static final int LEFT_EXTEND = -169000;
-    public static final int LEFT_MID = -157000;
+    public static final int LEFT_MID = -157000; //-157000
     public static final int LEFT_CLIMB = -11000;
-    public static final int RIGHT_EXTEND = 169000;
+    public static final int RIGHT_FIRST_EXTEND = 164904; //169000
+    public static final int RIGHT_EXTEND = 169000; //169000
     public static final int RIGHT_MID = 157000;
     public static final int RIGHT_CLIMB = 11000;
     public static boolean kLeftSensorPhase = true;
@@ -80,6 +82,7 @@ public final class Constants {
     public static final int kPIDLoopIdx = 0;
     public static final int kSlotIdx = 0;
     public static final double kP = 30d / 2048;
+    public static final double FEXTEND = -37 * 2048 * 15 / 9d;
     public static final double EXTEND = -50 * 2048 * 15 / 9d;
     public static final double MID = -20 * 2048 * 15 / 9d;
   }
