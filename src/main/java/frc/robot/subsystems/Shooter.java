@@ -56,7 +56,7 @@ public class Shooter extends SubsystemBase {
     leftShooter.setInverted(InvertType.InvertMotorOutput);
     rightShooter.setInverted(InvertType.None);
     if(!SmartDashboard.containsKey("MaxPercentage")) SmartDashboard.putNumber("MaxPercentage", ShooterConstants.MAXPERCENT);
-    if(!SmartDashboard.containsKey("SetVoltage")) SmartDashboard.putNumber("SetVoltage", 5.75);
+    if(!SmartDashboard.containsKey("SetVoltage")) SmartDashboard.putNumber("SetVoltage", 5.25);
     if(!SmartDashboard.containsKey("Lerp Table")) SmartDashboard.putNumber("Lerp Target", target);
     if(!SmartDashboard.containsKey("Shooter Adjust")) SmartDashboard.putNumber("Shooter Adjust", adjust);
     limitCurrent = new SupplyCurrentLimitConfiguration(true, 60, 60, 1);
@@ -110,7 +110,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void autoSpeed() {
-    setSetpoint(1.32 * target);
+    setSetpoint(1.3 * target);
   }
 
   //Negative is Out, Positive is In

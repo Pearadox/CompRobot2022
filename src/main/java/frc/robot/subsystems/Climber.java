@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.commands.ClimberZero;
 import frc.robot.commands.CompressClimberSol;
@@ -24,6 +25,9 @@ import frc.robot.commands.SetFirstExtend;
 import frc.robot.commands.SetMidRung;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+
+import java.util.function.BooleanSupplier;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -42,6 +46,8 @@ public class Climber extends SubsystemBase {
   private DoubleSolenoid rightSolenoid;
 
   private int count = 0;
+  private int rescount = -1;
+  private boolean stopping = false;
 
   /** Creates a new Climber. */
   public Climber() {
@@ -113,7 +119,7 @@ public class Climber extends SubsystemBase {
   }
 
   public void climbDown() {
-    setClimbMotor(0.7);
+    setClimbMotor(0.8);
   }
 
   public void stopClimb() {
@@ -180,6 +186,12 @@ public class Climber extends SubsystemBase {
     SmartDashboard.putNumber("Climber Sequence", count);
     SmartDashboard.putNumber("Left Error", getLeftError());
     SmartDashboard.putNumber("Right Error", getRightError());
+
+    if(RobotContainer.getOperJoystick().getPOV() != -1 && (RobotContainer.getOperJoystick().getPOV() > 314 || RobotContainer.getOperJoystick().getPOV() < 46)) {
+      restoreSequence();
+    } else if (RobotContainer.getOperJoystick().getPOV() != -1 && (RobotContainer.getOperJoystick().getPOV() > 134 && RobotContainer.getOperJoystick().getPOV() < 226)) {
+      stopSequence();
+    }
   }
 
   public static Climber getInstance() {
@@ -231,8 +243,30 @@ public class Climber extends SubsystemBase {
       case 12:
         CommandScheduler.getInstance().schedule(new SetClimb().withTimeout(0.6));
         break;
+      case 13:
+        CommandScheduler.getInstance().schedule(new RunCommand(() ->  this.setClimbMotor(0)).withTimeout(0.04));
     }
     count++;
+  }
+
+  public void restoreSequence() {
+    if (rescount != -1) {
+      stopping = false;
+      count = rescount;
+    }
+  }
+
+  public void stopSequence() {
+    if(count < 13) {
+      rescount = count;
+    }
+    stopping = true;
+    count = 13;
+    incrementSequence();
+  }
+
+  public boolean getStopping() {
+    return stopping;
   }
 
   public void resetSequence() {

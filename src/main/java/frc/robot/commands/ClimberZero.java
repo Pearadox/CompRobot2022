@@ -54,6 +54,6 @@ public class ClimberZero extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return leftZeroed && rightZeroed;
+    return (leftZeroed && rightZeroed) || RobotContainer.climber.getStopping();
   }
 }

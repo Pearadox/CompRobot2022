@@ -39,7 +39,7 @@ public class SetExtend extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {    
-    return false;
+    return RobotContainer.climber.getStopping();
     // ((Math.abs(RobotContainer.climber.getLeftError()) < 100) && (Math.abs(RobotContainer.climber.getRightError()) < 100));
   }
 }

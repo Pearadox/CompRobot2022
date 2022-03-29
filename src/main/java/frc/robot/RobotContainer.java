@@ -21,9 +21,11 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.command.WaitCommand;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -65,7 +67,8 @@ public class RobotContainer {
     SmartDashboard.putData("Auton Chooser", auton);
     climber.setDefaultCommand(new DefaultClimberDown());
     auton.setDefaultOption("TwoBallAuton", "TwoBallAuton");
-    auton.addOption("ThreeBallAuton", "ThreeBallAuton");
+    auton.addOption("RightThreeBallAuton", "RightThreeBallAuton");
+    auton.addOption("LeftThreeBallAuton", "LeftThreeBallAuton");
     // auton.addOption("TwoBallAuton", "TwoBallAuton");
   }
 
@@ -163,6 +166,8 @@ public class RobotContainer {
     opbtn10.whenPressed(new CompressClimberSol());
     opbtn11.whenPressed(climber::resetSequence);
     opbtn12.whenPressed(new InstantCommand(() -> shooter.setMode(Mode.kFixedHigh)));
+    
+
 
     // opbtn12.whileHeld(new SetMidRung());
     // opbtn11.whenPressed(new InstantCommand(
@@ -187,6 +192,10 @@ public class RobotContainer {
     //   () -> {
     //   shooter.rightShooter.set(ControlMode.PercentOutput, 0);
     // }, shooter));
+  }
+
+  public static Joystick getOperJoystick() {
+    return operatorJoystick;
   }
 
   public Command makeRamseteCommand(String path) {
@@ -221,7 +230,7 @@ public class RobotContainer {
     Path path = Filesystem.getDeployDirectory().toPath().resolve("output/" + "RightBack" + ".wpilib.json");
     Trajectory trajectory = TrajectoryUtil.fromPathweaverJson(path);
     drivetrain.resetOdometry(trajectory.getInitialPose());
-    var ThreeBallAuton = new RunCommand(() -> shooter.setVoltage(5.35), shooter).alongWith(
+    var RightThreeAuton = new RunCommand(() -> shooter.setVoltage(5.35), shooter).alongWith(
       new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8))
         .andThen(new ToggleIntake().withTimeout(0.5))
         .andThen(new InstantCommand(() -> shooter.setMode(Mode.kAuto)))
@@ -240,7 +249,24 @@ public class RobotContainer {
         .andThen(new RunCommand(() -> drivetrain.setVoltages(-8, -8), drivetrain).withTimeout(0.75))
         .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain)));
     
-    var TwoBallAuton = new RunCommand(() -> shooter.setVoltage(5.25), shooter).alongWith(
+    var LeftThreeAuton = new RunCommand(() -> shooter.setVoltage(5.35), shooter).alongWith(
+          new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8))
+            .andThen(new ToggleIntake().withTimeout(0.5))
+            .andThen(new InstantCommand(() -> shooter.setMode(Mode.kAuto)))
+            .andThen(new InstantCommand(() -> RobotContainer.intake.setIntakeIn(0.5)))
+            .andThen(makeRamseteCommand("RightBack"))
+            .andThen(new AutoAim().withTimeout(1))
+            .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(2))
+            .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8)))
+            .andThen(new edu.wpi.first.wpilibj2.command.WaitCommand(2))
+            .andThen(makeRamseteCommand("Left1"))
+            .andThen(makeRamseteCommand("Right2"))
+            .andThen(new ToggleIntake().withTimeout(0.4))
+            .andThen(new AutoAim().withTimeout(1))
+            .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(2))
+            .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain)));
+    
+    var TwoAuton = new RunCommand(() -> shooter.setVoltage(5.25), shooter).alongWith(
       new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8))
         .andThen(new ToggleIntake().withTimeout(0.4))
         .andThen(new InstantCommand(() -> shooter.setMode(Mode.kAuto)))
@@ -250,9 +276,13 @@ public class RobotContainer {
         .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(3))
         .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8))));
     if(auton.getSelected().equals("TwoBallAuton")) {
-      return TwoBallAuton;
-    } else {
-      return ThreeBallAuton;
+      return TwoAuton;
+    } else if (auton.getSelected().equals("RightThreeBallAuton")){
+      return RightThreeAuton;
+    } else if (auton.getSelected().equals("LeftThreeBallAuton")){
+      return LeftThreeAuton;
+    } else{
+      return TwoAuton;
     }
 
     

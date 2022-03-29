@@ -35,8 +35,8 @@ public class AutoAim extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double kS = 0.2;
-    double kP = 0.05;
+    double kS = 0.25;
+    double kP = 0.075;
     double error = llTable.getEntry("tx").getDouble(0);
     double targets = llTable.getEntry("tv").getDouble(0);
     if(targets == 0 ) {      
@@ -45,7 +45,7 @@ public class AutoAim extends CommandBase {
     }
     else {
       if(Math.abs(RobotContainer.driverJoystick.getY()) < 0.3) {
-        if (Math.abs(error) > 1) {
+        if (Math.abs(error) > 0.5) {
           RobotContainer.drivetrain.setVoltages(kS * Math.signum(error) + kP * error + -RobotContainer.driverJoystick.getY(), -kP * error - kS * Math.signum(error) + -RobotContainer.driverJoystick.getY());
         } else {
           RobotContainer.drivetrain.setVoltages(0, 0);

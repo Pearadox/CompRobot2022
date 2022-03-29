@@ -10,6 +10,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax.IdleMode;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
@@ -44,6 +45,7 @@ public class Drivetrain extends SubsystemBase {
   public double Vision_ki = 0.0;
   public double Vision_kd = 0.0;
   public double Vision_dz = 0.3;
+  // SlewRateLimiter filter = new SlewRateLimiter(0.7);
 
   public void setMode(boolean mode){
     if(mode){
@@ -140,6 +142,7 @@ public class Drivetrain extends SubsystemBase {
     throttle *= Math.abs(throttle);
     twist *= Math.abs(twist);
     setVoltages(12 * (throttle + twist), 12 * (throttle - twist));
+    // setVoltages(filter.calculate(12 * (throttle + twist)), 12 * (throttle - twist));
   }
 
   private final DifferentialDriveOdometry odometry =

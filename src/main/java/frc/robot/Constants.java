@@ -84,7 +84,7 @@ public final class Constants {
     public static final double kP = 30d / 2048;
     public static final double FEXTEND = -37 * 2048 * 15 / 9d;
     public static final double EXTEND = -50 * 2048 * 15 / 9d;
-    public static final double MID = -20 * 2048 * 15 / 9d;
+    public static final double MID = -21 * 2048 * 15 / 9d;
   }
 
   public static final class TransportConstants {
@@ -104,10 +104,9 @@ public final class Constants {
     public static final int RIGHT_SHOOTER = 30;
     public static final double MAXPERCENT = 0.4;
 
-    public static final double 
-    kS = 0.84535; //0.84535
+    public static final double kS = 0.84535; //0.84535
     public static final double kV = 0.11811; //0.11811
-    public static final double kP = 0.0307; //0.04257
+    public static final double kP = 0.0307; //0.04257 and 0.0307
   }
 
   public static int kTimeoutMs = 200;
