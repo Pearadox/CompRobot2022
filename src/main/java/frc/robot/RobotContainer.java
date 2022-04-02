@@ -69,6 +69,8 @@ public class RobotContainer {
     auton.setDefaultOption("TwoBallAuton", "TwoBallAuton");
     auton.addOption("RightThreeBallAuton", "RightThreeBallAuton");
     auton.addOption("LeftThreeBallAuton", "LeftThreeBallAuton");
+    auton.addOption("FourBall", "FourBall");
+    auton.addOption("TwoBallRude", "TwoBallRude");
     // auton.addOption("TwoBallAuton", "TwoBallAuton");
   }
 
@@ -108,8 +110,8 @@ public class RobotContainer {
   JoystickButton opbtn12 = new JoystickButton(operatorJoystick, 12);
 
   private void configureButtonBindings() {
-    btn1.whileHeld(new RunCommand(() -> transport.setSpeed(-0.5), transport).withTimeout(0.2).andThen(
-      new RunCommand(transport::feederShoot, transport)))
+    btn1.whileHeld( // new RunCommand(() -> transport.setSpeed(-0.5), transport).withTimeout(0.2).andThen(
+      new RunCommand(transport::feederShoot, transport))
         .whenReleased(
           new InstantCommand(transport::transportStop, transport).andThen(transport::clearBall, transport)
     );
@@ -127,7 +129,7 @@ public class RobotContainer {
     btn8.whileHeld(new Outtake());
     btn9.whenPressed(new ExpandClimberSol());
     btn10.whenPressed(new CompressClimberSol());
-    btn11.whenPressed(new InstantCommand(() -> shooter.setMode(Mode.kFixedLow)));
+    btn11.whenPressed(new InstantCommand(() -> shooter.setMode(Mode.kFixedHigh)));
     btn12.whenPressed(new InstantCommand(() -> shooter.setMode(Mode.kAuto))); 
 
     opbtn1.whenPressed(climber::incrementSequence);
@@ -275,15 +277,73 @@ public class RobotContainer {
         .andThen(new AutoAim().withTimeout(1))
         .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(3))
         .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8))));
-    if(auton.getSelected().equals("TwoBallAuton")) {
-      return TwoAuton;
-    } else if (auton.getSelected().equals("RightThreeBallAuton")){
-      return RightThreeAuton;
-    } else if (auton.getSelected().equals("LeftThreeBallAuton")){
-      return LeftThreeAuton;
-    } else{
-      return TwoAuton;
-    }
+    
+    var FourBall = new RunCommand(() -> shooter.setVoltage(4.9), shooter).alongWith(
+      new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8))
+        .andThen(new ToggleIntake().withTimeout(0.5))
+        .andThen(new InstantCommand(() -> shooter.setMode(Mode.kAuto)))
+        .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
+        .andThen(new InstantCommand(() -> RobotContainer.intake.setIntakeIn(0.4)))
+        .andThen(makeRamseteCommand("RightBack"))
+        // .andThen(new ToggleIntake().withTimeout(0.1))
+        .andThen(new AutoAim().withTimeout(0.5))
+        .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
+        .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(1.5))
+        // .andThen(new ToggleIntake().withTimeout(0.2))
+        .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8)))
+        .andThen(new InstantCommand(() -> transport.setSpeed(0.4)))
+        .andThen(makeRamseteCommand("Right1"))
+        .andThen(makeRamseteCommand("Right2_0"))
+        .andThen(makeRamseteCommand("Right3"))
+        .andThen(new RunCommand(() -> drivetrain.setVoltages(-8, -8), drivetrain).withTimeout(1.4))
+        .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
+        .andThen(new ToggleIntake().withTimeout(0.3))
+        .andThen(new AutoAim().withTimeout(1.25))
+        .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
+        .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(2)));
+
+      var TwoBallRude = new InstantCommand(() -> shooter.setVoltage(5.6), shooter).andThen(
+          new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8))
+            .andThen(new ToggleIntake().withTimeout(0.5))
+            .andThen(new InstantCommand(() -> shooter.setMode(Mode.kAuto)))
+            .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
+            .andThen(new InstantCommand(() -> RobotContainer.intake.setIntakeIn(0.4)))
+            .andThen(makeRamseteCommand("TwoBallRude1"))
+            .andThen(new AutoAim().withTimeout(0.5))
+            .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
+            .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(2.5))
+            .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8)))
+            .andThen(new InstantCommand(() -> transport.setSpeed(0.4)))
+            .andThen(makeRamseteCommand("TwoBallRude2"))
+            .andThen(makeRamseteCommand("TwoBallRude3"))
+            .andThen(makeRamseteCommand("TwoBallRude4"))
+            .andThen(new InstantCommand(() -> shooter.setVoltage(3.25), shooter))
+            .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
+            .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(1.5))
+            .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8)))
+            .andThen(new InstantCommand(() -> transport.setSpeed(0.4)))
+            // .andThen(new RunCommand(() -> drivetrain.setVoltages(-8, -8), drivetrain).withTimeout(1.4))
+            // .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
+            // .andThen(new ToggleIntake().withTimeout(0.3))
+            // .andThen(new AutoAim().withTimeout(1.25))
+            // .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
+            // .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(2))
+            );
+
+      if(auton.getSelected().equals("TwoBallAuton")) {
+          return TwoAuton;
+        } else if (auton.getSelected().equals("RightThreeBallAuton")){
+          return RightThreeAuton;
+        } else if (auton.getSelected().equals("LeftThreeBallAuton")){
+          return LeftThreeAuton;
+        } else if (auton.getSelected().equals("TwoBallRude")) {
+          Path path2 = Filesystem.getDeployDirectory().toPath().resolve("output/" + "TwoBallRude1" + ".wpilib.json");
+          Trajectory traj2 = TrajectoryUtil.fromPathweaverJson(path2);
+          drivetrain.resetOdometry(traj2.getInitialPose());
+          return TwoBallRude;
+        } else{
+          return FourBall;
+        }
 
     
   }

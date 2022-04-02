@@ -24,7 +24,12 @@ public class DefaultClimberDown extends CommandBase {
   @Override
   public void execute() {
     if(SmartDashboard.getNumber("Climber Sequence", 0) == 0) {
-      RobotContainer.climber.setClimbMotor(0.1);
+      // if(SmartDashboard.getNumber("Left Lift Encoder", 0) > 0.75) {
+        RobotContainer.climber.setLeftLiftMotor(0.1);
+      // }
+      // if(SmartDashboard.getNumber("Right Lift Encoder", 0) > 0.75) {
+        RobotContainer.climber.setRightLiftMotor(0.1);
+      // }
     } else {
       RobotContainer.climber.setClimbMotor(0);
     }    

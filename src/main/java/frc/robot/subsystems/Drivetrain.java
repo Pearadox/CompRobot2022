@@ -45,7 +45,7 @@ public class Drivetrain extends SubsystemBase {
   public double Vision_ki = 0.0;
   public double Vision_kd = 0.0;
   public double Vision_dz = 0.3;
-  // SlewRateLimiter filter = new SlewRateLimiter(0.7);
+  SlewRateLimiter filter = new SlewRateLimiter(0.9);
 
   public void setMode(boolean mode){
     if(mode){
@@ -139,10 +139,10 @@ public class Drivetrain extends SubsystemBase {
       twist = 0;
     }
 
-    throttle *= Math.abs(throttle);
+    throttle *= filter.calculate(Math.abs(throttle));
     twist *= Math.abs(twist);
-    setVoltages(12 * (throttle + twist), 12 * (throttle - twist));
-    // setVoltages(filter.calculate(12 * (throttle + twist)), 12 * (throttle - twist));
+    // setVoltages(12 * (throttle + twist), 12 * (throttle - twist));
+    setVoltages(12 * (throttle + twist),12 * (throttle - twist));
   }
 
   private final DifferentialDriveOdometry odometry =

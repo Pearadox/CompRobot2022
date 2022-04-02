@@ -7,6 +7,7 @@ package frc.robot;
 import java.io.IOException;
 
 import com.revrobotics.REVPhysicsSim;
+import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.util.net.PortForwarder;
@@ -74,7 +75,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData(llSwitch);
     PortForwarder.add(8888, "limelight.local", 5800);
     PortForwarder.add(8889, "limelight.local", 5801);
-
+    RobotContainer.shooter.setLeds(0);
   }
 
   /**
@@ -101,17 +102,21 @@ public class Robot extends TimedRobot {
   public void disabledInit() {
     setState(RobotState.DISABLED);
     RobotContainer.drivetrain.setMode(false);
-    RobotContainer.shooter.setLeds(3);
+    RobotContainer.shooter.setLeds(0);
   }
 
   @Override
   public void disabledPeriodic() {
-    RobotContainer.drivetrain.setMode(false);
+    if(RobotContainer.drivetrain.leftMotor1.getIdleMode() == IdleMode.kBrake) {
+      RobotContainer.drivetrain.setMode(false);
+    }
   }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    RobotContainer.drivetrain.setMode(true);
+    RobotContainer.shooter.setLeds(3);
     try {
       m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     } catch (IOException e) {
@@ -123,7 +128,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
-    RobotContainer.drivetrain.setMode(true);
+    
   }
 
   /** This function is called periodically during autonomous. */

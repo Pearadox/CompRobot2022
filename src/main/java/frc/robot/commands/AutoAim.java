@@ -35,8 +35,8 @@ public class AutoAim extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double kS = 0.25;
-    double kP = 0.075;
+    double kS = 0.225 ;
+    double kP = 0.05;
     double error = llTable.getEntry("tx").getDouble(0);
     double targets = llTable.getEntry("tv").getDouble(0);
     if(targets == 0 ) {      
