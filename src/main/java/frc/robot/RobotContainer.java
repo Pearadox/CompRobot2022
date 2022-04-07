@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.revrobotics.ColorSensorV3;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
@@ -50,7 +51,9 @@ public class RobotContainer {
   public static final Climber climber = Climber.getInstance();
   public static final Compressor compressor = new Compressor(1, PneumaticsModuleType.REVPH);
   public static final PowerDistribution pdh = new PowerDistribution();
+  public static final PicoColorSensor colorSensor = new PicoColorSensor();
   SendableChooser<String> auton = new SendableChooser<>();
+  public static final SendableChooser<Boolean> toggleFlashlight = new SendableChooser<>();
 
   // private final ExampleCommand m_autoCommand = new ExampleCommand(m_Drivetrain);
   // dania stinks
@@ -72,6 +75,9 @@ public class RobotContainer {
     auton.addOption("FourBall", "FourBall");
     auton.addOption("TwoBallRude", "TwoBallRude");
     // auton.addOption("TwoBallAuton", "TwoBallAuton");
+    SmartDashboard.putData("Toggle Flashlight", toggleFlashlight);
+    toggleFlashlight.setDefaultOption("Off", false);
+    toggleFlashlight.addOption("On", true);
   }
 
   /**
@@ -286,23 +292,24 @@ public class RobotContainer {
         .andThen(new InstantCommand(() -> RobotContainer.intake.setIntakeIn(0.4)))
         .andThen(makeRamseteCommand("RightBack"))
         // .andThen(new ToggleIntake().withTimeout(0.1))
-        .andThen(new AutoAim().withTimeout(0.5))
+        .andThen(new AutoAim().withTimeout(0.35))
         .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
         .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(1.5))
         // .andThen(new ToggleIntake().withTimeout(0.2))
         .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8)))
         .andThen(new InstantCommand(() -> transport.setSpeed(0.4)))
         .andThen(makeRamseteCommand("Right1"))
-        .andThen(makeRamseteCommand("Right2_0"))
-        .andThen(makeRamseteCommand("Right3"))
+        // .andThen(makeRamseteCommand("Right2_0"))
+        // .andThen(makeRamseteCommand("Right3"))
+        .andThen(makeRamseteCommand("Right2-3"))
         .andThen(new RunCommand(() -> drivetrain.setVoltages(-8, -8), drivetrain).withTimeout(1.4))
         .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
         .andThen(new ToggleIntake().withTimeout(0.3))
-        .andThen(new AutoAim().withTimeout(1.25))
+        .andThen(new AutoAim().withTimeout(1.0))
         .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
         .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(2)));
 
-      var TwoBallRude = new InstantCommand(() -> shooter.setVoltage(5.6), shooter).andThen(
+      var TwoBallRude = new InstantCommand(() -> shooter.setVoltage(5.25), shooter).andThen(
           new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8))
             .andThen(new ToggleIntake().withTimeout(0.5))
             .andThen(new InstantCommand(() -> shooter.setMode(Mode.kAuto)))

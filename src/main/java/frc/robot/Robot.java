@@ -13,6 +13,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.util.net.PortForwarder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -93,8 +94,9 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
     SmartDashboard.putNumber("Pressure", RobotContainer.compressor.getPressure());
-    RobotContainer.pdh.setSwitchableChannel(llSwitch.getSelected());
-    
+    RobotContainer.pdh.setSwitchableChannel(RobotContainer.toggleFlashlight.getSelected());
+    SmartDashboard.putNumber("Color Sensor Blue", RobotContainer.colorSensor.getRawColor0().blue);
+    SmartDashboard.putNumber("Color Sensor Red", RobotContainer.colorSensor.getRawColor0().red);
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

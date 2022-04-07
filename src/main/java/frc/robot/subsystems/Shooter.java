@@ -66,19 +66,19 @@ public class Shooter extends SubsystemBase {
     rightShooter.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 20, Constants.TIMEOUT);
 
     // LOOKUP TABLE (LIMELIGHT TY, VOLTAGE)
-    shooterLerp.addPoint(16, 1.3 * (2.5 - ShooterConstants.kS)/ ShooterConstants.kV);
-    shooterLerp.addPoint(9.1, 1.3 * (2.7 - ShooterConstants.kS) / ShooterConstants.kV);    
+    shooterLerp.addPoint(16, ShooterConstants.ShooterAdjust * (2.5 - ShooterConstants.kS)/ ShooterConstants.kV);
+    shooterLerp.addPoint(9.1, ShooterConstants.ShooterAdjust * (2.7 - ShooterConstants.kS) / ShooterConstants.kV);    
     // shooterLerp.addPoint(1, 3.6);
-    shooterLerp.addPoint(3.9, 1.3 * (3.75 - ShooterConstants.kS) / ShooterConstants.kV);
-    shooterLerp.addPoint(-0.5, 1.3 * (4.05 - ShooterConstants.kS) / ShooterConstants.kV);
-    shooterLerp.addPoint(-3.8, 1.3 * (4.15 - ShooterConstants.kS) / ShooterConstants.kV);
-    shooterLerp.addPoint(-6.9, 1.3 * (4.225 - ShooterConstants.kS) / ShooterConstants.kV);
-    shooterLerp.addPoint(-9.4, 1.3 * (4.34 - ShooterConstants.kS) / ShooterConstants.kV);
-    shooterLerp.addPoint(-12.2, 1.3 * (4.5 - ShooterConstants.kS) / ShooterConstants.kV);
-    shooterLerp.addPoint(-14.5, 1.3 * (4.58 - ShooterConstants.kS) / ShooterConstants.kV);
-    shooterLerp.addPoint(-16.6, 1.3 * (4.775 - ShooterConstants.kS) / ShooterConstants.kV);
-    shooterLerp.addPoint(-19.25, 1.3 * (5.125 - ShooterConstants.kS) / ShooterConstants.kV);
-    shooterLerp.addPoint(-21.5, 1.3 * (5.8 - ShooterConstants.kS) / ShooterConstants.kV);
+    shooterLerp.addPoint(3.9, ShooterConstants.ShooterAdjust * (3.75 - ShooterConstants.kS) / ShooterConstants.kV);
+    shooterLerp.addPoint(-0.5, ShooterConstants.ShooterAdjust * (4.05 - ShooterConstants.kS) / ShooterConstants.kV);
+    shooterLerp.addPoint(-3.8, ShooterConstants.ShooterAdjust * (4.15 - ShooterConstants.kS) / ShooterConstants.kV);
+    shooterLerp.addPoint(-6.9, ShooterConstants.ShooterAdjust * (4.225 - ShooterConstants.kS) / ShooterConstants.kV);
+    shooterLerp.addPoint(-9.4, ShooterConstants.ShooterAdjust * (4.34 - ShooterConstants.kS) / ShooterConstants.kV);
+    shooterLerp.addPoint(-12.2, ShooterConstants.ShooterAdjust * (4.5 - ShooterConstants.kS) / ShooterConstants.kV);
+    shooterLerp.addPoint(-14.5, ShooterConstants.ShooterAdjust * (4.58 - ShooterConstants.kS) / ShooterConstants.kV);
+    shooterLerp.addPoint(-16.6, ShooterConstants.ShooterAdjust * (4.775 - ShooterConstants.kS) / ShooterConstants.kV);
+    shooterLerp.addPoint(-19.25, ShooterConstants.ShooterAdjust * (5.125 - ShooterConstants.kS) / ShooterConstants.kV);
+    shooterLerp.addPoint(-21.5, ShooterConstants.ShooterAdjust * (5.8 - ShooterConstants.kS) / ShooterConstants.kV);
   }
 
   public void setMode(Mode mode) {
@@ -154,13 +154,22 @@ public class Shooter extends SubsystemBase {
     // rightShooter.configSupplyCurrentLimit(limitCurrent);
     // }
 
+    // if (llTable.getEntry("ta").getDouble(0) > 0 && mode == Mode.kAuto) {
+    //   ty = tyFilter.calculate(llTable.getEntry("ty").getDouble(0));
+    //   target = shooterLerp.interpolate(ty);
+    // } else if (mode == Mode.kFixedLow) {
+    //   target = 3.5 / ShooterConstants.kV;
+    // } else {
+    //   target = SmartDashboard.getNumber("Shooter Target RPM", 0);
+    // }
+
     if (llTable.getEntry("ta").getDouble(0) > 0 && mode == Mode.kAuto) {
       ty = tyFilter.calculate(llTable.getEntry("ty").getDouble(0));
       target = shooterLerp.interpolate(ty);
     } else if (mode == Mode.kFixedLow) {
-      target = 3.5 / ShooterConstants.kV;
+      target = SmartDashboard.getNumber("SetVoltage", 5.75) / ShooterConstants.kV;
     } else {
-      target = SmartDashboard.getNumber("Shooter Target RPM", 0);
+      target = SmartDashboard.getNumber("SetVoltage", 5.75)/ ShooterConstants.kV;
     }
     // SmartDashboard.putNumber("Target", target);
     SmartDashboard.putNumber("Lerp Target", target);
