@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.TransportIn;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -26,9 +27,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * project.
  */
 public class Robot extends TimedRobot {
-  private Command m_autonomousCommand;
-
   private RobotContainer m_robotContainer;
+
+  private Command m_autonomousCommand;
 
   public static int brownOutCtn = 0;
 
@@ -68,7 +69,14 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-    m_robotContainer = new RobotContainer();
+    try {
+      m_robotContainer = new RobotContainer();
+    } catch (IOException e1) {
+      // TODO Auto-generated catch block
+      e1.printStackTrace();
+    }
+
+    
     llSwitch.addOption("On", true);
     llSwitch.addOption("Off", false);
     llSwitch.setDefaultOption("On", true);
@@ -119,18 +127,18 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     RobotContainer.drivetrain.setMode(true);
     RobotContainer.shooter.setLeds(3);
+    
     try {
       m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+  } catch (IOException e) {
+    // TODO Auto-generated catch block
+    e.printStackTrace();
+  }
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
-    
   }
 
   /** This function is called periodically during autonomous. */
@@ -146,6 +154,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    RobotContainer.transport.setDefaultCommand(new TransportIn());
     RobotContainer.drivetrain.setMode(true);
     RobotContainer.shooter.setLeds(3);
   }

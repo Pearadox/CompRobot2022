@@ -49,6 +49,9 @@ public class Transport extends SubsystemBase {
     botTransportMotor.set(-speed);
   }
 
+  public void setBotSpeed(double speed){
+    botTransportMotor.set(-speed);
+  }
   public void transportIn() {
     if (!hasBall) {
       topTransportMotor.set(-0.3);
@@ -72,6 +75,7 @@ public class Transport extends SubsystemBase {
     topTransportMotor.set(-0.4);
     botTransportMotor.set(-0.9);
     feeder.set(ControlMode.PercentOutput, 1);
+    System.out.println("bozo");
   }
 
   public void clearBall() {

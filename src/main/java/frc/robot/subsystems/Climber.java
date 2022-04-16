@@ -115,11 +115,11 @@ public class Climber extends SubsystemBase {
   }
 
   public void climbUp() {
-    setClimbMotor(-0.5);
+    setClimbMotor(0.5);
   }
 
   public void climbDown() {
-    setClimbMotor(0.8);
+    setClimbMotor(-0.8);
   }
 
   public void stopClimb() {
@@ -214,36 +214,30 @@ public class Climber extends SubsystemBase {
         CommandScheduler.getInstance().schedule(new SetClimb());
         break;
       case 3:
-        CommandScheduler.getInstance().schedule(new RunCommand(() -> this.setClimbMotor(- 0.2)).withTimeout(0.5).andThen(new SetMidRung()));
+        CommandScheduler.getInstance().schedule(new RunCommand(() -> this.setClimbMotor(0.2)).withTimeout(0.5).andThen(new SetMidRung().withTimeout(0.25)).andThen(new CompressClimberSol()));
         break;
       case 4:
-        CommandScheduler.getInstance().schedule(new CompressClimberSol());
+        CommandScheduler.getInstance().schedule(new SetExtend());
         break;
       case 5:
-        CommandScheduler.getInstance().schedule(new SetExtend());
+        CommandScheduler.getInstance().schedule(new ExpandClimberSol());
         break;
       case 6:
-        CommandScheduler.getInstance().schedule(new ExpandClimberSol());
-        break;
-      case 7:
         CommandScheduler.getInstance().schedule(new SetClimb());
         break;
+      case 7:
+        CommandScheduler.getInstance().schedule(new RunCommand(() -> this.setClimbMotor(0.2)).withTimeout(0.5).andThen(new SetMidRung().withTimeout(0.25)).andThen(new CompressClimberSol()));
+        break;
       case 8:
-        CommandScheduler.getInstance().schedule(new RunCommand(() -> this.setClimbMotor(-0.2)).withTimeout(0.5).andThen(new SetMidRung()));
-        break;
-      case 9:
-        CommandScheduler.getInstance().schedule(new CompressClimberSol());
-        break;
-      case 10:
         CommandScheduler.getInstance().schedule(new SetExtend());
         break;
-      case 11:
+      case 9:
         CommandScheduler.getInstance().schedule(new ExpandClimberSol());
         break;
-      case 12:
+      case 10:
         CommandScheduler.getInstance().schedule(new SetClimb().withTimeout(0.6));
         break;
-      case 13:
+      case 11:
         CommandScheduler.getInstance().schedule(new RunCommand(() ->  this.setClimbMotor(0)).withTimeout(0.04));
     }
     count++;

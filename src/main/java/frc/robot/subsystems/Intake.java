@@ -61,6 +61,12 @@ public class Intake extends SubsystemBase {
   public void intakeCloseSol() {
     intakeSolenoid.set(Value.kReverse);
   }
+
+  public void intakeShoot() {
+    if(getIntakeValue() == DoubleSolenoid.Value.kOff || getIntakeValue() == DoubleSolenoid.Value.kForward) {
+      intakeCloseSol();
+    }
+  }
   
   public void intakeToggleSol() {
     if(getIntakeValue() == DoubleSolenoid.Value.kOff || getIntakeValue() == DoubleSolenoid.Value.kReverse) {

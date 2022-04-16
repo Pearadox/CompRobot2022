@@ -82,9 +82,9 @@ public final class Constants {
     public static final int kPIDLoopIdx = 0;
     public static final int kSlotIdx = 0;
     public static final double kP = 30d / 2048;
-    public static final double FEXTEND = -37 * 2048 * 15 / 9d;
-    public static final double EXTEND = -50 * 2048 * 15 / 9d;
-    public static final double MID = -21 * 2048 * 15 / 9d;
+    public static final double FEXTEND = 40 * 2048 * 15 / 9d;
+    public static final double EXTEND = 50 * 2048 * 15 / 9d;
+    public static final double MID = 21 * 2048 * 15 / 9d;
   }
 
   public static final class TransportConstants {
@@ -103,7 +103,7 @@ public final class Constants {
     public static final int LEFT_SHOOTER = 31;
     public static final int RIGHT_SHOOTER = 30;
     public static final double MAXPERCENT = 0.4;
-    public static final double ShooterAdjust = 1.2;
+    public static final double ShooterAdjust = 1.215;
 
     public static final double kS = 0.70798; //0.84535
     public static final double kV = 0.11; //0.11811

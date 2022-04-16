@@ -36,9 +36,10 @@ public class AutoAim extends CommandBase {
   @Override
   public void execute() {
     double kS = 0.225 ;
-    double kP = 0.05;
+    double kP = 0.07;
     double error = llTable.getEntry("tx").getDouble(0);
     double targets = llTable.getEntry("tv").getDouble(0);
+    if(RobotContainer.shooter.getMode() != RobotContainer.shooter.getLowMode()){
     if(targets == 0 ) {      
       RobotContainer.drivetrain.arcadeDrive(
         -RobotContainer.driverJoystick.getY(), RobotContainer.driverJoystick.getZ());
@@ -63,6 +64,7 @@ public class AutoAim extends CommandBase {
           RobotContainer.drivetrain.setSpeed(speed - output, speed + output);
       }
     }
+  }
   }
 
   // Called once the command ends or is interrupted.

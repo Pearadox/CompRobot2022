@@ -30,14 +30,14 @@ public class ClimberZero extends CommandBase {
   @Override
   public void execute() {
     if (!leftZeroed) {
-      RobotContainer.climber.setLeftLiftMotor(0.25);
+      RobotContainer.climber.setLeftLiftMotor(-0.25);
       if (RobotContainer.climber.leftLiftMotor.getSupplyCurrent() > 17.5) {
         RobotContainer.climber.setLeftLiftMotor(0);
         leftZeroed = true;
       }
     }
     if (!rightZeroed) {
-      RobotContainer.climber.setRightLiftMotor(0.25);
+      RobotContainer.climber.setRightLiftMotor(-0.25);
       if (RobotContainer.climber.rightLiftMotor.getSupplyCurrent() > 17.5) {
         RobotContainer.climber.setRightLiftMotor(0);
         rightZeroed = true;

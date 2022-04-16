@@ -28,9 +28,9 @@ public class SetClimb extends CommandBase {
   @Override
   public void execute() {
     if (Timer.getFPGATimestamp() - initialTime < 1.0) {
-      RobotContainer.climber.setClimbMotor(0.5);
+      RobotContainer.climber.setClimbMotor(-0.65);
     } else {
-      RobotContainer.climber.setClimbMotor(1);
+      RobotContainer.climber.setClimbMotor(-1);
     }
   }
 
