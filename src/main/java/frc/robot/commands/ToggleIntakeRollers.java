@@ -19,9 +19,9 @@ public class ToggleIntakeRollers extends CommandBase {
   @Override
   public void initialize() {
     if(RobotContainer.intake.getIntakeValue() == Value.kOff || RobotContainer.intake.getIntakeValue() == Value.kReverse) {
-      RobotContainer.intake.setSpeed(-0.5);
+      RobotContainer.intake.setSpeed(-0.5, -0.5);
     } else {
-      RobotContainer.intake.setSpeed(0.5);
+      RobotContainer.intake.setSpeed(0.5, 0.5);
     }
   }
 

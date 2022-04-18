@@ -6,14 +6,21 @@ package frc.robot;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -30,6 +37,7 @@ import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.lib.drivers.EForwardableConnections;
+import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Shooter.Mode;
@@ -50,8 +58,8 @@ public class RobotContainer {
   public static final Compressor compressor = new Compressor(1, PneumaticsModuleType.REVPH);
   public static final PowerDistribution pdh = new PowerDistribution();
   public static final PicoColorSensor colorSensor = new PicoColorSensor();
-  SendableChooser<Command> auton = new SendableChooser<>();
-  public static final SendableChooser<Boolean> toggleFlashlight = new SendableChooser<>();
+  SendableChooser<Boolean> toggleFlashlight = new SendableChooser<>();
+  SendableChooser<String> auton = new SendableChooser<>();
 
   // private final ExampleCommand m_autoCommand = new ExampleCommand(m_Drivetrain);
   // dania stinks
@@ -67,7 +75,14 @@ public class RobotContainer {
     intake.setDefaultCommand(new IntakeIn());
     SmartDashboard.putData("Auton Chooser", auton);
     climber.setDefaultCommand(new DefaultClimberDown());
-
+    auton.setDefaultOption("TwoBallAuton", "TwoBallAuton");
+    auton.addOption("RightThreeBallAuton", "RightThreeBallAuton");
+    auton.addOption("LeftThreeBallAuton", "LeftThreeAuton");
+    auton.addOption("FourBall", "FourBall");
+    auton.addOption("TwoBallRude", "TwoBallRude");
+    auton.addOption("FiveBall", "FiveBall");
+    auton.addOption("TwoMeters", "TwoMeters");
+    auton.addOption("TestArc", "TestArc");
     SmartDashboard.putData("Toggle Flashlight", toggleFlashlight);
     toggleFlashlight.setDefaultOption("Off", false);
     toggleFlashlight.addOption("On", true);
@@ -123,7 +138,7 @@ public class RobotContainer {
         new RunCommand(intake::stop, intake)
       ) 
     );
-    btn4.whileHeld(new SetClimb());
+    btn4.whileHeld(new RunCommand(() -> drivetrain.arcadeDrive(-0.4,0)));
     btn5.whileHeld(new SetMidRung());
     btn6.whileHeld(new SetExtend());
     btn7.whenPressed(new ToggleIntake().withTimeout(0.4));
@@ -211,19 +226,30 @@ public class RobotContainer {
     paths.add("Left1");
     paths.add("Right3");
     paths.add("Right2_0");
+    paths.add("Right2-3");
     paths.add("TwoBallRude1");
     paths.add("TwoBallRude2");
     paths.add("TwoBallRude3");
     paths.add("TwoBallRude4");
-    paths.add("FiveBall1");
-    paths.add("FiveBall2");
-    paths.add("FiveBall3");
-    paths.add("FiveBall4");
+    paths.add("FiveBall1Comp");
+    paths.add("FiveBall2Comp");
+    paths.add("FiveBall3Comp");
+    paths.add("TwoMeters");
+    paths.add("TestArc");
 
     for(String path : paths) {
       Path _path = Filesystem.getDeployDirectory().toPath().resolve("output/" + path + ".wpilib.json");
       trajectories.add(TrajectoryUtil.fromPathweaverJson(_path));
     }
+
+    TrajectoryConfig config = new TrajectoryConfig(Constants.DrivetrainConstants.MAX_VELOCITY, Constants.DrivetrainConstants.MAX_ACCEL)
+    .setKinematics(DrivetrainConstants.KINEMATICS);
+
+    trajectories.add(TrajectoryGenerator.generateTrajectory(
+      new Pose2d(0, 0, new Rotation2d(0)), 
+      List.of(new Translation2d(1,0)),
+      new Pose2d(2, 0, new Rotation2d(0)), 
+      config));
   }
 
   public static Command makeRamseteCommand(String path) {
@@ -241,26 +267,43 @@ public class RobotContainer {
       return command;
   }
 
-  public void makeAuton() {
-    var RightThreeAuton = new InstantCommand(() -> shooter.setVoltage(5.37), shooter).andThen(
-      new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8))
+  private Command makeRamseteCommand2() {
+    RamseteCommand command = new RamseteCommand(
+      trajectories.get(paths.size()-1), 
+      drivetrain::getPose, 
+      new RamseteController(Constants.DrivetrainConstants.kRamseteB, Constants.DrivetrainConstants.kRamseteZeta), 
+      new SimpleMotorFeedforward(Constants.DrivetrainConstants.kS, Constants.DrivetrainConstants.kV, Constants.DrivetrainConstants.kA), 
+      Constants.DrivetrainConstants.KINEMATICS, 
+      drivetrain::getWheelSpeeds, 
+      new PIDController(0, 0, 0), 
+      new PIDController(0, 0, 0), 
+      drivetrain::setVoltages,
+      drivetrain);
+    return command;
+}
+
+  /**
+   * Use this to pass the autonomous command to the main {@link Robot} class.
+   *
+   * @return the command to run in autonomous
+   * @throws IOException
+   */
+  public Command getAutonomousCommand() throws IOException {
+
+    var RightThreeAuton = new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.3))
         .andThen(new ToggleIntake().withTimeout(0.5))
         .andThen(new InstantCommand(() -> shooter.setMode(Mode.kAuto)))
-        .andThen(new InstantCommand(() -> RobotContainer.intake.setIntakeIn(0.5)))
+        .andThen(new InstantCommand(() -> RobotContainer.intake.setIntakeIn(0.35)))
         .andThen(makeRamseteCommand("RightBack"))
         .andThen(new ToggleIntake().withTimeout(0.5))
-        .andThen(new AutoAim().withTimeout(1))
-        .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(2))
-        .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8)))
+        .andThen(new Shoot().withTimeout(2))
+        .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.3)))
         .andThen(new ToggleIntake().withTimeout(0.5))
-        .andThen(new InstantCommand(() -> intake.setIntakeIn(1)))
-        .andThen(new InstantCommand(() -> shooter.setVoltage(5.2), shooter))
+        .andThen(new InstantCommand(() -> intake.setIntakeIn(0.35)))
         .andThen(makeRamseteCommand("Right1"))
         .andThen(makeRamseteCommand("Right2"))
-        .andThen(new ToggleIntake().withTimeout(0.4))
-        .andThen(new AutoAim().withTimeout(1))
-        .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(2))
-        .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain)));
+        .andThen(new Shoot().withTimeout(2))
+        .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain));
     
     var LeftThreeAuton = new RunCommand(() -> shooter.setVoltage(5.35), shooter).alongWith(
           new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8))
@@ -279,62 +322,65 @@ public class RobotContainer {
             .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(2))
             .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain)));
     
-    var TwoAuton = new RunCommand(() -> shooter.setVoltage(5.1), shooter).alongWith(
-      new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8))
+    var TwoAuton = new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.3))
         .andThen(new ToggleIntake().withTimeout(0.4))
         .andThen(new InstantCommand(() -> shooter.setMode(Mode.kAuto)))
-        .andThen(new InstantCommand(() -> RobotContainer.intake.setIntakeIn(0.5)))
+        .andThen(new InstantCommand(() -> RobotContainer.intake.setIntakeIn(0.35)))
         .andThen(makeRamseteCommand("RightBack"))
+        .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0)))
         .andThen(new ToggleIntake().withTimeout(0.5))
-        .andThen(new AutoAim().withTimeout(1))
-        .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(3))
-        .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8))));
+        .andThen(new Shoot().withTimeout(3))
+        .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.3)))
+        .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0)));
     
-    var FourBall = new RunCommand(() -> shooter.setVoltage(5.02), shooter).alongWith(
-      new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8))
+    var FourBall = new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.3))
         .andThen(new ToggleIntake().withTimeout(0.5))
         .andThen(new InstantCommand(() -> shooter.setMode(Mode.kAuto)))
         .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
-        .andThen(new InstantCommand(() -> RobotContainer.intake.setIntakeIn(0.4)))
+        .andThen(new InstantCommand(() -> RobotContainer.intake.setIntakeIn(0.35)))
         .andThen(makeRamseteCommand("RightBack"))
-        // .andThen(new ToggleIntake().withTimeout(0.1))
-        .andThen(new AutoAim().withTimeout(1.0))
+        .andThen(new ToggleIntake().withTimeout(0.1))
         .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
-        .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(1.5))
-        // .andThen(new ToggleIntake().withTimeout(0.2))
-        .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8)))
-        .andThen(new InstantCommand(() -> transport.setSpeed(0.4)))
+        .andThen(new Shoot().withTimeout(2.5))
+        .andThen(new InstantCommand(() -> transport.stopTopMotor()))
+        .andThen(new ToggleIntake().withTimeout(0.2))
+        .andThen(new InstantCommand(() -> RobotContainer.intake.setIntakeIn(0.35)))
+        .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.3)))
+        .andThen(new InstantCommand(() -> transport.setBotSpeed(0.4)))
         .andThen(makeRamseteCommand("Right1"))
         .andThen(makeRamseteCommand("Right2_0"))
         .andThen(makeRamseteCommand("Right3"))
-        // .andThen(makeRamseteCommand("Right2-3"))
-        .andThen(new RunCommand(() -> drivetrain.setVoltages(-8, -8), drivetrain).withTimeout(1.4))
+        .andThen(makeRamseteCommand("Right2-3"))
         .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
         .andThen(new ToggleIntake().withTimeout(0.3))
-        .andThen(new AutoAim().withTimeout(1.0))
-        .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
-        .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(2)));
+        .andThen(new Shoot().withTimeout(2.5));
 
-    var TwoBallRude = new InstantCommand(() -> shooter.setVoltage(5.25), shooter).andThen(
-        new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8))
+    var TwoBallRude = new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.3))
           .andThen(new ToggleIntake().withTimeout(0.5))
           .andThen(new InstantCommand(() -> shooter.setMode(Mode.kAuto)))
           .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
-          .andThen(new InstantCommand(() -> RobotContainer.intake.setIntakeIn(0.4)))
+          .andThen(new InstantCommand(() -> transport.stopTopMotor()))
+          .andThen(new InstantCommand(() -> RobotContainer.intake.setIntakeIn(0.35)))
           .andThen(makeRamseteCommand("TwoBallRude1"))
-          .andThen(new AutoAim().withTimeout(0.5))
+          .andThen(new ToggleIntake().withTimeout(0.5))
           .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
-          .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(2.5))
-          .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8)))
-          .andThen(new InstantCommand(() -> transport.setSpeed(0.4)))
+          .andThen(new Shoot().withTimeout(2.5))
+          .andThen(new InstantCommand(() -> transport.stopTopMotor()))
+          .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.3)))
+          .andThen(new InstantCommand(() -> transport.setBotSpeed(0.4)))
+          .andThen(new ToggleIntake().withTimeout(0.5))
+          .andThen(new InstantCommand(() -> RobotContainer.intake.setIntakeIn(0.35)))
           .andThen(makeRamseteCommand("TwoBallRude2"))
           .andThen(makeRamseteCommand("TwoBallRude3"))
           .andThen(makeRamseteCommand("TwoBallRude4"))
+          .andThen(new ToggleIntake().withTimeout(0.5))
+          .andThen(new InstantCommand(() -> shooter.setMode(Mode.kFixedHigh)))
           .andThen(new InstantCommand(() -> shooter.setVoltage(3.25), shooter))
           .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
-          .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(1.5))
-          .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8)))
-          .andThen(new InstantCommand(() -> transport.setSpeed(0.4)))
+          .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(2))
+          .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.3)))
+          .andThen(new InstantCommand(() -> transport.setSpeed(0.4))
+          .andThen(new InstantCommand(() -> shooter.setMode(Mode.kAuto)))
           // .andThen(new RunCommand(() -> drivetrain.setVoltages(-8, -8), drivetrain).withTimeout(1.4))
           // .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
           // .andThen(new ToggleIntake().withTimeout(0.3))
@@ -344,64 +390,61 @@ public class RobotContainer {
           );
 
     var FiveBall = new InstantCommand(() -> shooter.setVoltage(4.76))
-        .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8)))
+        .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.3)))
+        .andThen(new InstantCommand(() -> transport.stopTopMotor()))
         .andThen(new InstantCommand(() -> transport.setBotSpeed(0.4)))
         .andThen(new ToggleIntake().withTimeout(0.1))
-        .andThen(new InstantCommand(() -> intake.setIntakeIn(1)))
-        .andThen(makeRamseteCommand("FiveBall1"))
+        .andThen(new InstantCommand(() -> intake.setIntakeIn(0.35)))
+        .andThen(makeRamseteCommand("FiveBall1Comp"))
         .andThen(new Shoot().withTimeout(2.5))
+        .andThen(new InstantCommand(() -> transport.stopTopMotor()))
         .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.8)))
-        .andThen(new InstantCommand(() -> transport.setSpeed(0.4)))
+        .andThen(new InstantCommand(() -> transport.setBotSpeed(0.4)))
         .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0)))
         .andThen(new ToggleIntake().withTimeout(0.1))
-        .andThen(new InstantCommand(() -> intake.setIntakeIn(1)))
-        .andThen(makeRamseteCommand("FiveBall2"))
+        .andThen(new InstantCommand(() -> intake.setIntakeIn(0.35)))
+        .andThen(makeRamseteCommand("FiveBall2Comp"))
         .andThen(new RunCommand(() -> drivetrain.setVoltages(0, 0)).withTimeout(1.25))
-        .andThen(makeRamseteCommand("FiveBall3"))
+        .andThen(makeRamseteCommand("FiveBall3Comp"))
         .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0)))
         .andThen(new Shoot().withTimeout(2.5));
+    
+    var TwoMeters = makeRamseteCommand("TwoMeters").andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0)));
 
+    var TestArc = makeRamseteCommand("TestArc").andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0)));
     
-    auton.setDefaultOption("TwoBallAuton", TwoAuton);
-    auton.addOption("RightThreeBallAuton", RightThreeAuton);
-    auton.addOption("LeftThreeBallAuton", LeftThreeAuton);
-    auton.addOption("FourBall", FourBall);
-    auton.addOption("TwoBallRude", TwoBallRude);
-    auton.addOption("FiveBall", FiveBall);
-  }
-
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   * @throws IOException
-   */
-  public Command getAutonomousCommand() throws IOException {
-    
-    if (auton.getSelected().toString().equals("TwoBallRude")) {
-      drivetrain.resetOdometry(trajectories.get(paths.indexOf("TwoBallRude1")).getInitialPose());
-    } else if(auton.getSelected().toString().equals("FiveBall")) {
-      drivetrain.resetOdometry(trajectories.get(paths.indexOf("FiveBall1")).getInitialPose());
-    } else {
-      drivetrain.resetOdometry(trajectories.get(paths.indexOf("RightBack")).getInitialPose());
-    }
-    
-    // if(auton.getSelected().equals("TwoBallAuton")) {
-    //   return TwoAuton;
-    // } else if (auton.getSelected().equals("RightThreeBallAuton")){
-    //   return RightThreeAuton;
-    // } else if (auton.getSelected().equals("LeftThreeBallAuton")){
-    //   return LeftThreeAuton;
-    // } else if (auton.getSelected().equals("TwoBallRude")) {
+    // if (auton.getSelected().toString().equals("TwoBallRude")) {
     //   drivetrain.resetOdometry(trajectories.get(paths.indexOf("TwoBallRude1")).getInitialPose());
-    //   return TwoBallRude;
-    // } else if (auton.getSelected().equals("FiveBall")){
+    // } else if(auton.getSelected().toString().equals("FiveBall")) {
     //   drivetrain.resetOdometry(trajectories.get(paths.indexOf("FiveBall1")).getInitialPose());
-    //   return FiveBall;
-    // } else {
-    //   return FourBall;
+    // } else if (auton.getSelected().toString().equals("TwoMeters")){
+    //   drivetrain.resetOdometry(trajectories.get(16).getInitialPose());
     // }
-    return auton.getSelected();
+    //  else {
+    //   drivetrain.resetOdometry(trajectories.get(paths.indexOf("RightBack")).getInitialPose());
+    // }
+    
+    drivetrain.resetOdometry(trajectories.get(paths.indexOf("RightBack")).getInitialPose());
+    
+    if(auton.getSelected().equals("TwoBallAuton")) {
+      return TwoAuton;
+    } else if (auton.getSelected().equals("RightThreeBallAuton")){
+      return RightThreeAuton;
+    } else if (auton.getSelected().equals("LeftThreeBallAuton")){
+      return LeftThreeAuton;
+    } else if (auton.getSelected().equals("TwoBallRude")) {
+      drivetrain.resetOdometry(trajectories.get(paths.indexOf("TwoBallRude1")).getInitialPose());
+      return TwoBallRude;
+    } else if (auton.getSelected().equals("FiveBall")){
+      drivetrain.resetOdometry(trajectories.get(paths.indexOf("FiveBall1Comp")).getInitialPose());
+      return FiveBall;
+    } else if (auton.getSelected().equals("TestArc")){
+      drivetrain.resetOdometry(trajectories.get(paths.indexOf("TestArc")).getInitialPose());
+      return TestArc;
+    } 
+    else {
+      return FourBall;
+    }
   }
   private void portForwarding() {
     EForwardableConnections.addPortForwarding(EForwardableConnections.LIMELIGHT_CAMERA_FEED);

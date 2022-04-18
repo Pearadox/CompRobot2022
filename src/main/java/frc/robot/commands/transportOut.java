@@ -4,6 +4,9 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 
@@ -34,6 +37,16 @@ public class TransportOut extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    if(DriverStation.getAlliance() == Alliance.Blue){
+      if(!SmartDashboard.getString("Color", "None").equals("Red")){
+        return true;
+      }
+    }
+    if(DriverStation.getAlliance() == Alliance.Red){
+      if(!SmartDashboard.getString("Color", "None").equals("Blue")){
+        return true;
+      }
+    }
     return false;
   }
 }

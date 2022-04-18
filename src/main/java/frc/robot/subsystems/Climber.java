@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -235,10 +236,11 @@ public class Climber extends SubsystemBase {
         CommandScheduler.getInstance().schedule(new ExpandClimberSol());
         break;
       case 10:
-        CommandScheduler.getInstance().schedule(new SetClimb().withTimeout(0.6));
+        CommandScheduler.getInstance().schedule(new SetClimb().withTimeout(1.0));
         break;
       case 11:
         CommandScheduler.getInstance().schedule(new RunCommand(() ->  this.setClimbMotor(0)).withTimeout(0.04));
+        CommandScheduler.getInstance().schedule(new InstantCommand(() -> this.flashlightOn()));
     }
     count++;
   }
@@ -265,5 +267,13 @@ public class Climber extends SubsystemBase {
 
   public void resetSequence() {
     count = 0;
+  }
+
+  public void flashlightOn(){
+    RobotContainer.pdh.setSwitchableChannel(true);
+  }
+
+  public void flashlightOff(){
+    RobotContainer.pdh.setSwitchableChannel(false);
   }
 }

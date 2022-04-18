@@ -5,7 +5,10 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 
 public class TransportIn extends CommandBase {
@@ -21,6 +24,7 @@ public class TransportIn extends CommandBase {
   @Override
   public void initialize() {
     start = Timer.getFPGATimestamp();
+    RobotContainer.transport.clearBall();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -28,7 +32,7 @@ public class TransportIn extends CommandBase {
   public void execute() {
     RobotContainer.transport.transportIn();
     RobotContainer.transport.feederHold();
-    if (Timer.getFPGATimestamp() - start > .5 && RobotContainer.transport.feeder.getSupplyCurrent() > 4.5) {
+    if (Timer.getFPGATimestamp() - start > 1 && RobotContainer.transport.feeder.getSupplyCurrent() > 20) {
       RobotContainer.transport.detectBall();
     }
   }

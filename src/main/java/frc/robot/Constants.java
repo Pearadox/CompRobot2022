@@ -25,13 +25,13 @@ public final class Constants {
     public static final double kV = 3.2961; // Volt Seconds per Meter
     public static final double kA = 0.42341; // Volt Seconds Squared per Meter
 
-    public static final double kPVel = 6.9201; // Volt Seconds per Meter
+    public static final double kPVel = 4.134; // Volt Seconds per Meter
 
     public static final double TRACK_WIDTH = Units.inchesToMeters(22.5); // Meters
     public static final DifferentialDriveKinematics KINEMATICS =
         new DifferentialDriveKinematics(TRACK_WIDTH);
 
-    public static final double WHEEL_DIAMETER = Units.inchesToMeters(4.0 * 0.95); //Meters
+    public static final double WHEEL_DIAMETER = Units.inchesToMeters(4.0); //Meters
 
     public static final double DISTANCE_PER_REVOLUTION = WHEEL_DIAMETER * Math.PI;
     public static final double PULSES_PER_REVOLUTION = 42 * 5.6;
@@ -94,7 +94,8 @@ public final class Constants {
   }
 
   public static final class IntakeConstants {
-    public static final int INTAKE_MOTOR = 24;
+    public static final int INTAKE_RIGHT_MOTOR = 24;
+    public static final int INTAKE_LEFT_MOTOR = 33;
     public static final int INTAKE_FOR_SOLENOID = 5; 
     public static final int INTAKE_REV_SOLENOID = 4; 
   }
@@ -103,10 +104,10 @@ public final class Constants {
     public static final int LEFT_SHOOTER = 31;
     public static final int RIGHT_SHOOTER = 30;
     public static final double MAXPERCENT = 0.4;
-    public static final double ShooterAdjust = 1.215;
+    public static final double ShooterAdjust = 1.165;
 
-    public static final double kS = 0.70798; //0.84535
-    public static final double kV = 0.11; //0.11811
+    public static final double kS = 0.69004; //0.84535
+    public static final double kV = 0.10758; //0.11811
     public static final double kP = 0.02; //0.04257 and 0.0307
   }
 

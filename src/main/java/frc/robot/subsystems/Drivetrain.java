@@ -170,6 +170,8 @@ public class Drivetrain extends SubsystemBase {
     // This method will be called once per scheduler run
     pose = odometry.update(Rotation2d.fromDegrees(gyro.getAngle()), getLeftEncoderDistance(), getRightEncoderDistance());
     SmartDashboard.putNumber("Distance", (getLeftEncoderDistance() + getRightEncoderDistance())/2);
+    SmartDashboard.putNumber("Left Distance", (getLeftEncoderDistance()));
+    SmartDashboard.putNumber("Right Distance", (getRightEncoderDistance()));
     SmartDashboard.putNumber("Heading", getHeading());
     Vision_kp = SmartDashboard.getNumber("VisionHold_Kp", 0.02);
     Vision_kp = SmartDashboard.getNumber("VisionHold_Ki", 0.0);

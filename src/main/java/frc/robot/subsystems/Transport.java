@@ -26,7 +26,7 @@ public class Transport extends SubsystemBase {
   public TalonFX feeder;
   // private final TalonFX beterTransportMotor;
 
-  private boolean hasBall = false;
+  public boolean hasBall = false;
 
   /** Creates a new Transport. */
   public Transport() {
@@ -52,6 +52,11 @@ public class Transport extends SubsystemBase {
   public void setBotSpeed(double speed){
     botTransportMotor.set(-speed);
   }
+
+  public void stopTopMotor(){
+    topTransportMotor.set(0);
+  }
+
   public void transportIn() {
     if (!hasBall) {
       topTransportMotor.set(-0.3);
@@ -62,7 +67,8 @@ public class Transport extends SubsystemBase {
   }
 
   public void transportOut() {
-    setSpeed(-0.5);
+    botTransportMotor.set(1.0);
+    topTransportMotor.set(0.3);
   }
 
   public void transportStop() {
@@ -71,11 +77,14 @@ public class Transport extends SubsystemBase {
     feeder.set(ControlMode.PercentOutput, 0);
   }
 
+  public double getTopCurrent(){
+    return topTransportMotor.getOutputCurrent();
+  }
+
   public void feederShoot(){
-    topTransportMotor.set(-0.4);
+    topTransportMotor.set(-0.65);
     botTransportMotor.set(-0.9);
     feeder.set(ControlMode.PercentOutput, 1);
-    System.out.println("bozo");
   }
 
   public void clearBall() {
@@ -88,7 +97,8 @@ public class Transport extends SubsystemBase {
 
   public void feederHold() {
     if (!hasBall) {
-      feeder.set(ControlMode.PercentOutput, -1);
+      feeder.set(ControlMode.PercentOutput, -0.8);
+
     } else {
       feeder.set(ControlMode.PercentOutput, 0);
     }
@@ -103,6 +113,16 @@ public class Transport extends SubsystemBase {
     SmartDashboard.putNumber("bot Transport Current", botTransportMotor.getOutputCurrent());
     SmartDashboard.putNumber("feeder Transport Current", feeder.getSupplyCurrent());
     SmartDashboard.putBoolean("Has Ball", hasBall);
+
+    if(RobotContainer.colorSensor.getRawColor0().red - RobotContainer.colorSensor.getRawColor0().blue > 2000){
+      SmartDashboard.putString("Color", "Red");
+    }
+    else if(RobotContainer.colorSensor.getRawColor0().blue - RobotContainer.colorSensor.getRawColor0().red > 2000){
+      SmartDashboard.putString("Color", "Blue");
+    }
+    else{
+      SmartDashboard.putString("Color", "None");
+    }
     
     // if (topTransportMotor.get() != 0 && feeder.getSupplyCurrent() > 4) {
     //   hasBall = true;

@@ -20,7 +20,7 @@ public class Shoot extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      new AutoAim().until(() -> Math.abs(RobotContainer.shooter.getSpeed() - RobotContainer.shooter.getTarget()) < 2 
+      new AutoAim().until(() -> Math.abs(RobotContainer.shooter.getSpeed() - RobotContainer.shooter.getTarget()) < 0.5 
                             && Math.abs(RobotContainer.shooter.llTable.getEntry("tx").getDouble(0)) < 0.5).withTimeout(1)
                             .alongWith(new InstantCommand(RobotContainer.intake::intakeShoot, RobotContainer.intake))
                             .andThen((new InstantCommand(() -> RobotContainer.intake.setIntakeIn(0)))),
