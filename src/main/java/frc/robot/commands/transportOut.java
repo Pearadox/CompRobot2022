@@ -37,16 +37,6 @@ public class TransportOut extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if(DriverStation.getAlliance() == Alliance.Blue){
-      if(!SmartDashboard.getString("Color", "None").equals("Red")){
-        return true;
-      }
-    }
-    if(DriverStation.getAlliance() == Alliance.Red){
-      if(!SmartDashboard.getString("Color", "None").equals("Blue")){
-        return true;
-      }
-    }
     return false;
   }
 }

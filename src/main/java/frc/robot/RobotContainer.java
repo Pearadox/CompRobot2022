@@ -58,7 +58,8 @@ public class RobotContainer {
   public static final Compressor compressor = new Compressor(1, PneumaticsModuleType.REVPH);
   public static final PowerDistribution pdh = new PowerDistribution();
   public static final PicoColorSensor colorSensor = new PicoColorSensor();
-  SendableChooser<Boolean> toggleFlashlight = new SendableChooser<>();
+  public static SendableChooser<String> toggleFlashlight = new SendableChooser<>();
+  public static SendableChooser<Boolean> toggleAutoReject = new SendableChooser<>();
   SendableChooser<String> auton = new SendableChooser<>();
 
   // private final ExampleCommand m_autoCommand = new ExampleCommand(m_Drivetrain);
@@ -84,8 +85,11 @@ public class RobotContainer {
     auton.addOption("TwoMeters", "TwoMeters");
     auton.addOption("TestArc", "TestArc");
     SmartDashboard.putData("Toggle Flashlight", toggleFlashlight);
-    toggleFlashlight.setDefaultOption("Off", false);
-    toggleFlashlight.addOption("On", true);
+    toggleFlashlight.setDefaultOption("Off", "Off");
+    toggleFlashlight.addOption("On", "On");
+    SmartDashboard.putData("Toggle Auto Reject", toggleAutoReject);
+    toggleAutoReject.setDefaultOption("On", true);
+    toggleAutoReject.addOption("Off", false);
     SmartDashboard.putNumber("Angle", 0);
   }
 
@@ -130,8 +134,12 @@ public class RobotContainer {
         .whenReleased(
           new InstantCommand(transport::transportStop, transport).andThen(transport::clearBall, transport)
     );
-    btn2.whenPressed(new TurnToAngle(SmartDashboard.getNumber("Angle", 0))
-        .until(() -> Math.abs(drivetrain.getHeading()-SmartDashboard.getNumber("Angle", 0)) < 5));
+    btn2.whileHeld(new InstantCommand(() -> shooter.setMode(Mode.kFixedLow))
+      .andThen(new RunCommand(() -> transport.feederShoot())))
+      .whenReleased(new InstantCommand(() -> shooter.setMode(Mode.kAuto))
+                    .andThen(new InstantCommand(() -> transport.transportStop())));
+    // btn2.whenPressed(new TurnToAngle(SmartDashboard.getNumber("Angle", 0))
+    //     .until(() -> Math.abs(drivetrain.getHeading()-SmartDashboard.getNumber("Angle", 0)) < 5));
     btn3.toggleWhenPressed(
       new RunCommand(() -> transport.transportStop(), transport).alongWith(
         new RunCommand(() -> shooter.setSpeed(0), shooter), 
@@ -145,7 +153,7 @@ public class RobotContainer {
     btn8.whileHeld(new Outtake());
     btn9.whenPressed(new ExpandClimberSol());
     btn10.whenPressed(new CompressClimberSol());
-    btn11.whenPressed(new InstantCommand(() -> shooter.setMode(Mode.kFixedLow)));
+    btn11.whenPressed(new InstantCommand(() -> shooter.setMode(Mode.kFixedHigh)));
     btn12.whenPressed(new InstantCommand(() -> shooter.setMode(Mode.kAuto))); 
 
     opbtn1.whenPressed(climber::incrementSequence);
@@ -404,10 +412,10 @@ public class RobotContainer {
         .andThen(new ToggleIntake().withTimeout(0.1))
         .andThen(new InstantCommand(() -> intake.setIntakeIn(0.35)))
         .andThen(makeRamseteCommand("FiveBall2Comp"))
-        .andThen(new RunCommand(() -> drivetrain.setVoltages(0, 0)).withTimeout(1.25))
+        .andThen(new RunCommand(() -> drivetrain.setVoltages(0, 0)).withTimeout(0.75))
         .andThen(makeRamseteCommand("FiveBall3Comp"))
         .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0)))
-        .andThen(new Shoot().withTimeout(2.5));
+        .andThen(new Shoot().withTimeout(2));
     
     var TwoMeters = makeRamseteCommand("TwoMeters").andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0)));
 

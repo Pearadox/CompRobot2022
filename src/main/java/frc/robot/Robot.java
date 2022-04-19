@@ -5,6 +5,7 @@
 package frc.robot;
 
 import java.io.IOException;
+import java.sql.Driver;
 
 import com.revrobotics.REVPhysicsSim;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -107,7 +108,6 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Pressure", RobotContainer.compressor.getPressure());
     SmartDashboard.putNumber("Color Sensor Blue", RobotContainer.colorSensor.getRawColor0().blue);
     SmartDashboard.putNumber("Color Sensor Red", RobotContainer.colorSensor.getRawColor0().red);
-    RobotContainer.pdh.setSwitchableChannel(SmartDashboard.getBoolean("Toggle Flashlight", false));
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -116,7 +116,7 @@ public class Robot extends TimedRobot {
     setState(RobotState.DISABLED);
     RobotContainer.drivetrain.setMode(false);
     RobotContainer.shooter.setLeds(0);
-    RobotContainer.climber.flashlightOff();
+    RobotContainer.pdh.setSwitchableChannel(false);
   }
 
   @Override
@@ -166,6 +166,18 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+    if(RobotContainer.toggleAutoReject.getSelected()){
+    if(DriverStation.getAlliance() == Alliance.Red){
+      if(SmartDashboard.getString("Color", "None").equals("Blue")){
+        CommandScheduler.getInstance().schedule(new Outtake().withTimeout(1.5));
+      }
+    }
+    if(DriverStation.getAlliance() == Alliance.Blue){
+      if(SmartDashboard.getString("Color", "None").equals("Red")){
+        CommandScheduler.getInstance().schedule(new Outtake().withTimeout(1.5));
+      }
+    }
+  }
   }
 
   @Override

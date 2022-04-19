@@ -59,7 +59,7 @@ public class Transport extends SubsystemBase {
 
   public void transportIn() {
     if (!hasBall) {
-      topTransportMotor.set(-0.3);
+      topTransportMotor.set(-0.4);
     } else {
       topTransportMotor.set(0);
     }
@@ -68,7 +68,7 @@ public class Transport extends SubsystemBase {
 
   public void transportOut() {
     botTransportMotor.set(1.0);
-    topTransportMotor.set(0.3);
+    topTransportMotor.set(0.65);
   }
 
   public void transportStop() {

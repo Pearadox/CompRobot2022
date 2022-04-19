@@ -104,9 +104,9 @@ public final class Constants {
     public static final int LEFT_SHOOTER = 31;
     public static final int RIGHT_SHOOTER = 30;
     public static final double MAXPERCENT = 0.4;
-    public static final double ShooterAdjust = 1.165;
+    public static final double ShooterAdjust = 1; //1.165
 
-    public static final double kS = 0.69004; //0.84535
+    public static final double kS = 0.69004; //0.69004 0.84535
     public static final double kV = 0.10758; //0.11811
     public static final double kP = 0.02; //0.04257 and 0.0307
   }
