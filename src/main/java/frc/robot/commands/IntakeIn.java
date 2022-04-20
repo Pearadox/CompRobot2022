@@ -4,7 +4,9 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Robot;
@@ -27,11 +29,10 @@ public class IntakeIn extends CommandBase {
   @Override
   public void execute() {
     if (RobotContainer.intake.getIntakeValue() == Value.kForward) {
-      RobotContainer.intake.setIntakeIn(0.5);
+      RobotContainer.intake.setIntakeIn(0.4);
     } else {
       RobotContainer.intake.stop();
     }
-      
   }
 
   // Called once the command ends or is interrupted.

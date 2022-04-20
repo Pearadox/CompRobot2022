@@ -233,7 +233,7 @@ public class Climber extends SubsystemBase {
         CommandScheduler.getInstance().schedule(new CompressClimberSol());
         break;
       case 9:
-        CommandScheduler.getInstance().schedule(new SetClimb().withTimeout(1.0));
+        CommandScheduler.getInstance().schedule(new SetClimb().withTimeout(1.0).andThen(new ExpandClimberSol()));
         break;
       case 10:
         CommandScheduler.getInstance().schedule(new RunCommand(() ->  this.setClimbMotor(0)).withTimeout(0.04)
