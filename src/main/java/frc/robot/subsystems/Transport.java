@@ -59,7 +59,7 @@ public class Transport extends SubsystemBase {
 
   public void transportIn() {
     if (!hasBall) {
-      topTransportMotor.set(-0.25);
+      topTransportMotor.set(-0.18);
     } else {
       topTransportMotor.set(0);
     }
@@ -69,6 +69,11 @@ public class Transport extends SubsystemBase {
   public void transportOut() {
     botTransportMotor.set(1.0);
     topTransportMotor.set(0.85);
+  }
+
+  public void topTransportOut(){
+    topTransportMotor.set(0.9);
+    botTransportMotor.set(0.3);
   }
 
   public void transportStop() {
@@ -114,10 +119,10 @@ public class Transport extends SubsystemBase {
     SmartDashboard.putNumber("feeder Transport Current", feeder.getSupplyCurrent());
     SmartDashboard.putBoolean("Has Ball", hasBall);
 
-    if(RobotContainer.colorSensor.getRawColor0().red - RobotContainer.colorSensor.getRawColor0().blue > 2000){
+    if(RobotContainer.colorSensor.getRawColor0().red > 1000){
       SmartDashboard.putString("Color", "Red");
     }
-    else if(RobotContainer.colorSensor.getRawColor0().blue - RobotContainer.colorSensor.getRawColor0().red > 2000){
+    else if(RobotContainer.colorSensor.getRawColor0().blue > 1000){
       SmartDashboard.putString("Color", "Blue");
     }
     else{

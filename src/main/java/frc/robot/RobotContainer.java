@@ -150,9 +150,9 @@ public class RobotContainer {
     btn5.whileHeld(new SetMidRung());
     btn6.whileHeld(new SetExtend());
     btn7.whenPressed(new ToggleIntake().withTimeout(0.4));
-    btn8.whileHeld(new Outtake());
+    btn8.whileHeld(new OuttakeBtn());
     btn9.whenPressed(new ExpandClimberSol());
-    btn10.whenPressed(new CompressClimberSol());
+    btn10.whileHeld(new RunCommand(() -> transport.topTransportOut()));
     btn11.whenPressed(new InstantCommand(() -> shooter.setMode(Mode.kFixedHigh)));
     btn12.whenPressed(new InstantCommand(() -> shooter.setMode(Mode.kAuto))); 
 
@@ -235,6 +235,7 @@ public class RobotContainer {
     paths.add("Right3");
     paths.add("Right2_0");
     paths.add("Right2-3");
+    paths.add("TwoBallRudeNew1");
     paths.add("TwoBallRude1");
     paths.add("TwoBallRude2");
     paths.add("TwoBallRude3");
@@ -363,39 +364,61 @@ public class RobotContainer {
         .andThen(new ToggleIntake().withTimeout(0.3))
         .andThen(new Shoot().withTimeout(2.5));
 
-    var TwoBallRude = new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.3))
-          .andThen(new ToggleIntake().withTimeout(0.5))
-          .andThen(new InstantCommand(() -> shooter.setMode(Mode.kAuto)))
-          .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
-          .andThen(new InstantCommand(() -> transport.stopTopMotor()))
-          .andThen(new InstantCommand(() -> RobotContainer.intake.setIntakeIn(0.35)))
-          .andThen(makeRamseteCommand("TwoBallRude1"))
-          .andThen(new ToggleIntake().withTimeout(0.5))
-          .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
-          .andThen(new Shoot().withTimeout(2.5))
-          .andThen(new InstantCommand(() -> transport.stopTopMotor()))
-          .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.3)))
-          .andThen(new InstantCommand(() -> transport.setBotSpeed(0.4)))
-          .andThen(new ToggleIntake().withTimeout(0.5))
-          .andThen(new InstantCommand(() -> RobotContainer.intake.setIntakeIn(0.35)))
-          .andThen(makeRamseteCommand("TwoBallRude2"))
-          .andThen(makeRamseteCommand("TwoBallRude3"))
-          .andThen(makeRamseteCommand("TwoBallRude4"))
-          .andThen(new ToggleIntake().withTimeout(0.5))
-          .andThen(new InstantCommand(() -> shooter.setMode(Mode.kFixedHigh)))
-          .andThen(new InstantCommand(() -> shooter.setVoltage(3.25), shooter))
-          .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
-          .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(2))
-          .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.3)))
-          .andThen(new InstantCommand(() -> transport.setSpeed(0.4))
-          .andThen(new InstantCommand(() -> shooter.setMode(Mode.kAuto)))
-          // .andThen(new RunCommand(() -> drivetrain.setVoltages(-8, -8), drivetrain).withTimeout(1.4))
-          // .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
-          // .andThen(new ToggleIntake().withTimeout(0.3))
-          // .andThen(new AutoAim().withTimeout(1.25))
-          // .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
-          // .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(2))
-          );
+        var TwoBallRude = new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.3))
+        .andThen(new InstantCommand(() -> transport.stopTopMotor()))
+        .andThen(new InstantCommand(() -> transport.setBotSpeed(0.4)))
+        .andThen(new ToggleIntake().withTimeout(0.4))
+        .andThen(new InstantCommand(() -> shooter.setMode(Mode.kAuto)))
+        .andThen(new InstantCommand(() -> intake.setIntakeIn(0.35)))
+        .andThen(makeRamseteCommand("TwoBallRudeNew1"))
+        .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0)))
+        .andThen(new ToggleIntake().withTimeout(0.4))
+        .andThen(new Shoot().withTimeout(2))
+        .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.3)))
+        .andThen(new InstantCommand(() -> transport.stopTopMotor()))
+        .andThen(new InstantCommand(() -> transport.setBotSpeed(0.4)));
+        // .andThen(new ToggleIntake().withTimeout(0.4))
+        // .andThen(new InstantCommand(() -> intake.setIntakeIn(0.35)))
+        // .andThen(makeRamseteCommand("TwoBallRude2"))
+        // .andThen(makeRamseteCommand("TwoBallRude3"))
+        // .andThen(makeRamseteCommand("TwoBallRude4"))
+        // .andThen(new ToggleIntake().withTimeout(0.4))
+        // .andThen(new InstantCommand(() -> shooter.setMode(Mode.kFixedHigh)))
+        // .andThen(new InstantCommand(() -> shooter.setVoltage(3.5)))
+        // .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0)))
+        // .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(2))
+        // .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.3)))
+        // .andThen(new InstantCommand(() -> transport.setSpeed(0.4)))
+        // .andThen(new InstantCommand(() -> shooter.setMode(Mode.kAuto)));
+
+        // var TwoBallRude = new InstantCommand(() -> shooter.setVoltage(4.17))
+    //       .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.3)))
+    //       .andThen(new InstantCommand(() -> transport.setBotSpeed(0.4)))
+    //       .andThen(new ToggleIntake().withTimeout(0.5))
+    //       .andThen(new InstantCommand(() -> shooter.setMode(Mode.kFixedHigh)))
+    //       .andThen(new InstantCommand(() -> transport.stopTopMotor()))
+    //       .andThen(new InstantCommand(() -> RobotContainer.intake.setIntakeIn(0.4)))
+    //       .andThen(makeRamseteCommand("TwoBallRude1"))
+    //       .andThen(new ToggleIntake().withTimeout(0.1))
+    //       .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
+    //       .andThen(new AutoAim().until(() -> Math.abs(RobotContainer.shooter.getSpeed() - RobotContainer.shooter.getTarget()) < 0.5).withTimeout(1))
+    //       .andThen(new RunCommand(() -> transport.feederShoot()).withTimeout(1.5))
+    //       .andThen(new InstantCommand(() -> transport.stopTopMotor()))
+    //       .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.3)))
+    //       .andThen(new InstantCommand(() -> transport.setBotSpeed(0.4)))
+    //       .andThen(new ToggleIntake().withTimeout(0.5))
+    //       .andThen(new InstantCommand(() -> RobotContainer.intake.setIntakeIn(0.35)))
+    //       .andThen(makeRamseteCommand("TwoBallRude2"))
+    //       .andThen(makeRamseteCommand("TwoBallRude3"))
+    //       .andThen(makeRamseteCommand("TwoBallRude4"))
+    //       .andThen(new ToggleIntake().withTimeout(0.5))
+    //       .andThen(new InstantCommand(() -> shooter.setMode(Mode.kFixedHigh)))
+    //       .andThen(new InstantCommand(() -> shooter.setVoltage(3.5), shooter))
+    //       .andThen(new InstantCommand(() -> drivetrain.setVoltages(0, 0), drivetrain))
+    //       .andThen(new RunCommand(transport::feederShoot, transport).withTimeout(2))
+    //       .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.3)))
+    //       .andThen(new InstantCommand(() -> transport.setSpeed(0.4)))
+    //       .andThen(new InstantCommand(() -> shooter.setMode(Mode.kAuto)));
 
     var FiveBall = new InstantCommand(() -> shooter.setVoltage(4.76))
         .andThen(new InstantCommand(() -> transport.feeder.set(ControlMode.PercentOutput, -0.3)))
@@ -441,7 +464,7 @@ public class RobotContainer {
     } else if (auton.getSelected().equals("LeftThreeBallAuton")){
       return LeftThreeAuton;
     } else if (auton.getSelected().equals("TwoBallRude")) {
-      drivetrain.resetOdometry(trajectories.get(paths.indexOf("TwoBallRude1")).getInitialPose());
+      drivetrain.resetOdometry(trajectories.get(paths.indexOf("TwoBallRudeNew1")).getInitialPose());
       return TwoBallRude;
     } else if (auton.getSelected().equals("FiveBall")){
       drivetrain.resetOdometry(trajectories.get(paths.indexOf("FiveBall1Comp")).getInitialPose());

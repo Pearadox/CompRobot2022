@@ -69,19 +69,19 @@ public class Shooter extends SubsystemBase {
     rightShooter.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 20, Constants.TIMEOUT);
 
     // LOOKUP TABLE (LIMELIGHT TY, VOLTAGE)
-    shooterLerp.addPoint(-2.2, ShooterConstants.ShooterAdjust * (3.93 - 0*ShooterConstants.kS)/ ShooterConstants.kV);
+    shooterLerp.addPoint(-2.2, ShooterConstants.ShooterAdjust * (3.99 - 0*ShooterConstants.kS)/ ShooterConstants.kV);
     shooterLerp.addPoint(-5.6, ShooterConstants.ShooterAdjust * (4.06 - 0*ShooterConstants.kS) / ShooterConstants.kV);    
     // shooterLerp.addPoint(1, 3.6);
     // shooterLerp.addPoint(3.9, ShooterConstants.ShooterAdjust * (3.75 - ShooterConstants.kS) / ShooterConstants.kV);
     shooterLerp.addPoint(-8.6, ShooterConstants.ShooterAdjust * (4.16 - 0*ShooterConstants.kS) / ShooterConstants.kV);
     shooterLerp.addPoint(-12.3, ShooterConstants.ShooterAdjust * (4.32 - 0*ShooterConstants.kS) / ShooterConstants.kV);
-    shooterLerp.addPoint(-14.6, ShooterConstants.ShooterAdjust * (4.49 - 0*ShooterConstants.kS) / ShooterConstants.kV);
-    shooterLerp.addPoint(-16.3, ShooterConstants.ShooterAdjust * (4.57 - 0*ShooterConstants.kS) / ShooterConstants.kV);
-    shooterLerp.addPoint(-18.7, ShooterConstants.ShooterAdjust * (4.63 - 0*ShooterConstants.kS) / ShooterConstants.kV);
-    shooterLerp.addPoint(-20.4, ShooterConstants.ShooterAdjust * (4.8 - 0*ShooterConstants.kS) / ShooterConstants.kV);
-    shooterLerp.addPoint(-22.0, ShooterConstants.ShooterAdjust * (4.92 - 0*ShooterConstants.kS) / ShooterConstants.kV);
-    shooterLerp.addPoint(-23.2, ShooterConstants.ShooterAdjust * (5.0 - 0*ShooterConstants.kS) / ShooterConstants.kV);
-    shooterLerp.addPoint(-23.8, ShooterConstants.ShooterAdjust * (5.07 - 0*ShooterConstants.kS) / ShooterConstants.kV);
+    shooterLerp.addPoint(-14.6, 1.1 * ShooterConstants.ShooterAdjust * (4.49 - 0*ShooterConstants.kS) / ShooterConstants.kV);
+    shooterLerp.addPoint(-16.3, 1.1 * ShooterConstants.ShooterAdjust * (4.57 - 0*ShooterConstants.kS) / ShooterConstants.kV);
+    shooterLerp.addPoint(-18.7, 1.15 * ShooterConstants.ShooterAdjust * (4.63 - 0*ShooterConstants.kS) / ShooterConstants.kV);
+    shooterLerp.addPoint(-20.4, 1.15 * ShooterConstants.ShooterAdjust * (4.8 - 0*ShooterConstants.kS) / ShooterConstants.kV);
+    shooterLerp.addPoint(-22.0, 1.2 * ShooterConstants.ShooterAdjust * (4.92 - 0*ShooterConstants.kS) / ShooterConstants.kV);
+    shooterLerp.addPoint(-23.2, 1.25 * ShooterConstants.ShooterAdjust * (5.0 - 0*ShooterConstants.kS) / ShooterConstants.kV);
+    shooterLerp.addPoint(-23.8, 1.25 * ShooterConstants.ShooterAdjust * (5.07 - 0*ShooterConstants.kS) / ShooterConstants.kV);
   }
 
   public void setMode(Mode mode) {

@@ -227,15 +227,18 @@ public class Climber extends SubsystemBase {
         CommandScheduler.getInstance().schedule(new SetClimb());
         break;
       case 7:
-        CommandScheduler.getInstance().schedule(new RunCommand(() -> this.setClimbMotor(0.2)).withTimeout(0.5).andThen(new SetExtend()));
+      CommandScheduler.getInstance().schedule(new RunCommand(() -> this.setClimbMotor(0.2)).withTimeout(0.5).andThen(new SetMidRung().withTimeout(0.25)).andThen(new CompressClimberSol()));
         break;
       case 8:
-        CommandScheduler.getInstance().schedule(new CompressClimberSol());
+      CommandScheduler.getInstance().schedule(new SetExtend());
         break;
       case 9:
-        CommandScheduler.getInstance().schedule(new SetClimb().withTimeout(1.0).andThen(new ExpandClimberSol()));
-        break;
+      CommandScheduler.getInstance().schedule(new ExpandClimberSol());
+      break;
       case 10:
+        CommandScheduler.getInstance().schedule(new SetClimb().withTimeout(1.0));
+        break;
+      case 11:
         CommandScheduler.getInstance().schedule(new RunCommand(() ->  this.setClimbMotor(0)).withTimeout(0.04)
         .andThen(new InstantCommand(() -> this.flashlightOn())));
     }
